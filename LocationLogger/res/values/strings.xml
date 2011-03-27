@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">Hello World, HomeActivity!</string>
     <string name="app_name">LocationLogger</string>
+<string name="gps_notif_ticker">location logging started</string>
+<string name="gps_notif_title">Location Logger</string>
+<string name="gps_notif_text">Click to open Location Logger</string>
 </resources>
