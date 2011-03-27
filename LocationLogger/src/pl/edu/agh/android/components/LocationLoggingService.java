@@ -1,7 +1,13 @@
-package pl.edu.agh;
+package pl.edu.agh.android.components;
 
 import java.util.LinkedList;
+import java.util.List;
 
+import pl.edu.agh.android.messageComposer.impl.JSONMessageComposer;
+import pl.edu.agh.android.sender.DataSender;
+import pl.edu.agh.android.sender.impl.RestfulDataSender;
+import pl.edu.agh.android.sender.strategy.SendingStrategy;
+import pl.edu.agh.android.sender.strategy.impl.DumbSendingStrategy;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,7 +25,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
-public class LocationLoggingService extends Service {
+public class LocationLoggingService extends Service implements LocationDataSource {
 
 	private static final int MAX_HISTORY_SIZE = 1000;
 	private static final int NOTIF_ID = 435;
@@ -30,6 +36,7 @@ public class LocationLoggingService extends Service {
 	private boolean logging = false;
 	
 	private NotificationManager notificationManager;
+	private SendingStrategy sendingStrategy;
 	
 	private LinkedList<Location> locationHistory = new LinkedList<Location>();
 	private LocationManager locationManager;
@@ -119,6 +126,9 @@ public class LocationLoggingService extends Service {
 		
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		notificationManager.notify(NOTIF_ID,  notification);
+		
+		DataSender sender = new RestfulDataSender(this, new JSONMessageComposer());
+		sendingStrategy = new DumbSendingStrategy(sender, this, DumbSendingStrategy.DEFAULT_SEDING_INTERVAL);
 	}
 	
 	@Override
@@ -129,6 +139,7 @@ public class LocationLoggingService extends Service {
 		notificationManager.cancel(NOTIF_ID);
 	}
 	
+	//****************************SERVICE interface methods
 	public void registerHandler(Handler handler) {
 		this.guiHandler = handler;
 	}
@@ -143,8 +154,10 @@ public class LocationLoggingService extends Service {
 	
 	public void startLogging() {
 		if(!logging) {
+			
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, locationListener);
 			logging = true;
+			sendingStrategy.activate();
 		}
 	}
 	
@@ -153,6 +166,7 @@ public class LocationLoggingService extends Service {
 		if(logging) {
 			logging = false;
 			locationManager.removeUpdates(locationListener);
+			sendingStrategy.deactivate();
 		}
 	}
 	
@@ -161,6 +175,13 @@ public class LocationLoggingService extends Service {
 		sendLocationUpdateMessageToGui();
 		
 	}
+	
+	public List<Location> getLocationData() {
+		return this.locationHistory;
+	}
+	//*****************************************************
+	
+	
 	
 	private void sendLocationUpdateMessageToGui() {
 

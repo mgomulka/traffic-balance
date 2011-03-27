@@ -1,6 +1,7 @@
-package pl.edu.agh;
+package pl.edu.agh.android.components;
 
-import pl.edu.agh.LocationLoggingService.ServiceAccess;
+import pl.edu.agh.android.components.R;
+import pl.edu.agh.android.components.LocationLoggingService.ServiceAccess;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
