@@ -1,8 +1,8 @@
 package pl.edu.agh.jsonrpc;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public abstract class JSONRPCClient {
 
@@ -19,7 +19,7 @@ public abstract class JSONRPCClient {
 		// Copy method arguments in a json array
 		JSONArray jsonParams = new JSONArray();
 		for (int i = 0; i < params.length; i++) {
-			jsonParams.add(params[i]);
+			jsonParams.put(params[i]);
 		}
 
 		// Create the json request object
