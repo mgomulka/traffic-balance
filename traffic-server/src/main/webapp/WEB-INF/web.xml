@@ -7,6 +7,7 @@
 	<servlet>
 		<servlet-name>trafficServlet</servlet-name>
 		<servlet-class>pl.edu.agh.servlet.TrafficServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>trafficServlet</servlet-name>

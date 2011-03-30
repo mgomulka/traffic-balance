@@ -2,6 +2,8 @@ package pl.edu.agh.skeleton;
 
 import static pl.edu.agh.assembler.LocationDataBatchJSONAssembler.deserialize;
 import static pl.edu.agh.assembler.TrafficDataJSONAssembler.serialize;
+import static pl.edu.agh.service.TrafficService.GET_TRAFFIC_DATA_METHOD;
+import static pl.edu.agh.service.TrafficService.SEND_TRAFFIC_DATA_METHOD;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,9 +26,9 @@ public class TrafficSkeleton extends JSONRPCSkeleton {
 
 	@Override
 	protected JSONObject invoke(String methodName, JSONArray params) throws JSONException, JSONRPCException, NoSuchMethodException {
-		if (methodName.equals(TrafficService.GET_TRAFFIC_DATA_METHOD)) {
+		if (methodName.equals(GET_TRAFFIC_DATA_METHOD)) {
 			return invokeGetTrafficData(params);
-		} else if (methodName.equals(TrafficService.SEND_TRAFFIC_DATA_METHOD)) {
+		} else if (methodName.equals(SEND_TRAFFIC_DATA_METHOD)) {
 			return invokeSendTrafficData(params);
 		} else {
 			throw new NoSuchMethodException("Missing method: " + methodName + " in trafficService");

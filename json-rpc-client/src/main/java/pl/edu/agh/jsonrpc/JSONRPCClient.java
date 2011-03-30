@@ -6,10 +6,8 @@ import org.json.JSONObject;
 
 public abstract class JSONRPCClient {
 
-	
-
 	protected int soTimeout = 0, connectionTimeout = 0;
-	
+
 	protected abstract JSONObject doJSONRequest(JSONObject request) throws JSONRPCException;
 
 	protected JSONObject doRequest(String method, Object[] params) throws JSONRPCException {
