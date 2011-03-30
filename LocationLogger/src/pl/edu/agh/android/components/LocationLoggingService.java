@@ -5,7 +5,7 @@ import java.util.List;
 
 import pl.edu.agh.android.messageComposer.impl.JSONMessageComposer;
 import pl.edu.agh.android.sender.DataSender;
-import pl.edu.agh.android.sender.impl.RestfulDataSender;
+import pl.edu.agh.android.sender.impl.DataSenderImpl;
 import pl.edu.agh.android.sender.strategy.SendingStrategy;
 import pl.edu.agh.android.sender.strategy.impl.DumbSendingStrategy;
 import android.app.Notification;
@@ -127,7 +127,7 @@ public class LocationLoggingService extends Service implements LocationDataSourc
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		notificationManager.notify(NOTIF_ID,  notification);
 		
-		DataSender sender = new RestfulDataSender(this, new JSONMessageComposer());
+		DataSender sender = new DataSenderImpl(this);
 		sendingStrategy = new DumbSendingStrategy(sender, this, DumbSendingStrategy.DEFAULT_SEDING_INTERVAL);
 	}
 	

@@ -6,10 +6,7 @@ import org.json.JSONObject;
 
 public abstract class JSONRPCClient {
 
-	protected static final String RESULT_KEY = "result";
-	protected static final String PARAMS_KEY = "params";
-	protected static final String METHOD_KEY = "method";
-	protected static final String ERROR_KEY = "error";
+	
 
 	protected int soTimeout = 0, connectionTimeout = 0;
 	
@@ -25,8 +22,8 @@ public abstract class JSONRPCClient {
 		// Create the json request object
 		JSONObject jsonRequest = new JSONObject();
 		try {
-			jsonRequest.put(METHOD_KEY, method);
-			jsonRequest.put(PARAMS_KEY, jsonParams);
+			jsonRequest.put(JSONRPCConstants.METHOD_KEY, method);
+			jsonRequest.put(JSONRPCConstants.PARAMS_KEY, jsonParams);
 		} catch (JSONException e1) {
 			throw new JSONRPCException("Invalid JSON request", e1);
 		}
@@ -80,7 +77,7 @@ public abstract class JSONRPCClient {
 	 */
 	public Object call(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).get(RESULT_KEY);
+			return doRequest(method, params).get(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result", e);
 		}
@@ -99,7 +96,7 @@ public abstract class JSONRPCClient {
 	 */
 	public String callString(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getString(RESULT_KEY);
+			return doRequest(method, params).getString(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to String", e);
 		}
@@ -118,7 +115,7 @@ public abstract class JSONRPCClient {
 	 */
 	public int callInt(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getInt(RESULT_KEY);
+			return doRequest(method, params).getInt(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to int", e);
 		}
@@ -137,7 +134,7 @@ public abstract class JSONRPCClient {
 	 */
 	public long callLong(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getLong(RESULT_KEY);
+			return doRequest(method, params).getLong(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to long", e);
 		}
@@ -156,7 +153,7 @@ public abstract class JSONRPCClient {
 	 */
 	public boolean callBoolean(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getBoolean(RESULT_KEY);
+			return doRequest(method, params).getBoolean(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to boolean", e);
 		}
@@ -175,7 +172,7 @@ public abstract class JSONRPCClient {
 	 */
 	public double callDouble(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getDouble(RESULT_KEY);
+			return doRequest(method, params).getDouble(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to double", e);
 		}
@@ -194,7 +191,7 @@ public abstract class JSONRPCClient {
 	 */
 	public JSONObject callJSONObject(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getJSONObject(RESULT_KEY);
+			return doRequest(method, params).getJSONObject(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to JSONObject", e);
 		}
@@ -213,7 +210,7 @@ public abstract class JSONRPCClient {
 	 */
 	public JSONArray callJSONArray(String method, Object... params) throws JSONRPCException {
 		try {
-			return doRequest(method, params).getJSONArray(RESULT_KEY);
+			return doRequest(method, params).getJSONArray(JSONRPCConstants.RESULT_KEY);
 		} catch (JSONException e) {
 			throw new JSONRPCException("Cannot convert result to JSONArray", e);
 		}

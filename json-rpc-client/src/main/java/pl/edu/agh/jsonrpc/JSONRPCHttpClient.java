@@ -71,11 +71,9 @@ public class JSONRPCHttpClient extends JSONRPCClient {
 			JSONObject jsonResponse = new JSONObject(responseString);
 
 			// Check for remote errors
-			if (jsonResponse.has(ERROR_KEY)) {
-				Object jsonError = jsonResponse.get(ERROR_KEY);
-				if (!jsonError.equals(null))
-					throw new JSONRPCException(jsonResponse.get(ERROR_KEY));
-				return jsonResponse; // JSON-RPC 1.0
+			if (jsonResponse.has(JSONRPCConstants.ERROR_KEY)) {
+				String jsonError = jsonResponse.getString(JSONRPCConstants.ERROR_KEY);
+				throw new JSONRPCException(jsonError);
 			} else {
 				return jsonResponse; // JSON-RPC 2.0
 			}

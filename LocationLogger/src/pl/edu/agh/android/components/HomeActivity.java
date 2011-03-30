@@ -1,7 +1,10 @@
 package pl.edu.agh.android.components;
 
-import pl.edu.agh.android.components.R;
 import pl.edu.agh.android.components.LocationLoggingService.ServiceAccess;
+import pl.edu.agh.jsonrpc.JSONRPCException;
+import pl.edu.agh.model.TrafficData;
+import pl.edu.agh.service.TrafficService;
+import pl.edu.agh.service.TrafficServiceStub;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -13,10 +16,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class HomeActivity extends Activity {
 
@@ -106,6 +112,24 @@ public class HomeActivity extends Activity {
 	        			stopService(new Intent(HomeActivity.this, LocationLoggingService.class));
 	        		}
         		}
+			}
+		});
+        
+        final Button testButton = (Button)findViewById(R.id.testButton);
+        testButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				TrafficService trafficService = new TrafficServiceStub("192.168.1.107:8080");
+				try {
+					TrafficData result = trafficService.getTrafficData(0, 0);
+					
+					TextView testTextView = (TextView) findViewById(R.id.testTextView);
+					testTextView.setText(Integer.toString(result.getNumber()));
+					
+				} catch (JSONRPCException e) {
+					e.printStackTrace();
+				}
 			}
 		});
         

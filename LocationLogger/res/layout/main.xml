@@ -70,4 +70,7 @@
 <ToggleButton android:id="@+id/start_stop_button" android:layout_width="fill_parent"
        android:layout_height="wrap_content" android:textOn="Stop" android:textOff="Start">
 </ToggleButton>
+<TextView android:text="TextView" android:id="@+id/testTextView" android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
+<Button android:text="Pobierz dane" android:id="@+id/testButton" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
+
 </LinearLayout>
