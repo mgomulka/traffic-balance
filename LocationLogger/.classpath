@@ -2,7 +2,10 @@
 <classpath>
 	<classpathentry kind="src" output="target/classes" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/json-rpc-client/target/json-rpc-client-1.0-SNAPSHOT.jar" sourcepath="/json-rpc-client"/>
+	<classpathentry kind="lib" path="/traffic-common/target/traffic-common-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/json-rpc-core/target/json-rpc-core-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

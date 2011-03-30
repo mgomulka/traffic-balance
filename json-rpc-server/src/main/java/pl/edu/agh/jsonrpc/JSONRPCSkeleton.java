@@ -41,7 +41,7 @@ public abstract class JSONRPCSkeleton {
 			}
 		}
 		
-		out.print(jsonResponse.toString());
+		out.println(jsonResponse.toString());
 	}
 	
 	

@@ -14,12 +14,12 @@ import pl.edu.agh.model.TrafficData;
 
 public class TrafficServiceStub implements TrafficService {
 
-	private static final String SERVICE_URL_TEMPLATE = "http://%s/%s";
+	private static final String SERVICE_URL_TEMPLATE = "http://%s/%s/%s";
 	
 	private JSONRPCClient rpcClient;
 
-	public TrafficServiceStub(String serverUrl) {
-		rpcClient = new JSONRPCHttpClient(String.format(SERVICE_URL_TEMPLATE, serverUrl, SERVICE_NAME));
+	public TrafficServiceStub(String serverUrl, String applicationName) {
+		rpcClient = new JSONRPCHttpClient(String.format(SERVICE_URL_TEMPLATE, serverUrl, applicationName, SERVICE_NAME));
 	}
 
 	@Override

@@ -6,7 +6,7 @@
 
 	<servlet>
 		<servlet-name>trafficServlet</servlet-name>
-		<servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+		<servlet-class>pl.edu.agh.servlet.TrafficServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>trafficServlet</servlet-name>

@@ -120,7 +120,7 @@ public class HomeActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				TrafficService trafficService = new TrafficServiceStub("192.168.1.107:8080");
+				TrafficService trafficService = new TrafficServiceStub("192.168.1.105:8080", "traffic-server");
 				try {
 					TrafficData result = trafficService.getTrafficData(0, 0);
 					

@@ -15,14 +15,14 @@ import android.util.Log;
 
 public class DataSenderImpl implements DataSender {
 
-	private static final String SERVER_URL = "192.168.1.107:8080";
+	private static final String SERVER_URL = "192.168.1.105:8080";
 	
 	private LocationDataSource locationDataSource;
 	private TrafficService trafficService;
 
 	public DataSenderImpl(LocationDataSource locationDataSource) {
 		this.locationDataSource = locationDataSource;
-		this.trafficService = new TrafficServiceStub(SERVER_URL);
+		this.trafficService = new TrafficServiceStub(SERVER_URL, "traffic-server");
 	}
 
 	public void sendAllData() {

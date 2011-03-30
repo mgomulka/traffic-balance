@@ -15,9 +15,7 @@ public abstract class JSONRPCHttpServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		super.doPost(request, response);
-		
-		response.setContentType("application/json");
+		response.setContentType("text/html");
 		
 		BufferedReader in = request.getReader();
 		PrintWriter out = response.getWriter();

@@ -14,8 +14,10 @@ import pl.edu.agh.jsonrpc.JSONRPCSkeleton;
 import pl.edu.agh.model.LocationDataBatch;
 import pl.edu.agh.service.TrafficService;
 
-@Component
+@Component(TrafficSkeleton.BEAN_NAME)
 public class TrafficSkeleton extends JSONRPCSkeleton {
+	
+	public final static String BEAN_NAME = "trafficSkeleton";
 	
 	@Autowired
 	private TrafficService trafficService;
