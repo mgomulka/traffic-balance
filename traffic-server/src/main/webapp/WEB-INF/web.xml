@@ -9,14 +9,31 @@
 		<servlet-class>pl.edu.agh.servlet.TrafficServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>locationLoggerServlet</servlet-name>
+		<servlet-class>pl.edu.agh.servlet.LocationLoggerServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
 	<servlet-mapping>
 		<servlet-name>trafficServlet</servlet-name>
 		<url-pattern>/trafficService</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>locationLoggerServlet</servlet-name>
+		<url-pattern>/locationLoggerService</url-pattern>
+	</servlet-mapping>
 	
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/conf/applicationContext.xml</param-value>
+		<param-value>
+			/WEB-INF/conf/assemblers.xml,
+			/WEB-INF/conf/dao.xml,
+			/WEB-INF/conf/bo.xml,
+			/WEB-INF/conf/db.xml,
+			/WEB-INF/conf/services.xml,
+			/WEB-INF/conf/utils.xml,
+		</param-value>
 	</context-param>
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

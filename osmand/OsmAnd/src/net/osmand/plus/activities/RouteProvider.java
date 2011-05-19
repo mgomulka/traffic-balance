@@ -7,8 +7,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,8 +26,8 @@ import net.osmand.binary.BinaryRouteDataReader.RouteSegmentResult;
 import net.osmand.binary.BinaryRouteDataReader.RoutingContext;
 import net.osmand.osm.LatLon;
 import net.osmand.osm.MapUtils;
-import net.osmand.plus.R;
 import net.osmand.plus.OsmandSettings.ApplicationMode;
+import net.osmand.plus.R;
 import net.osmand.plus.activities.RoutingHelper.RouteDirectionInfo;
 import net.osmand.plus.activities.RoutingHelper.TurnType;
 import net.osmand.plus.render.MapRenderRepositories;
@@ -37,6 +39,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import pl.edu.agh.jsonrpc.JSONRPCException;
+import pl.edu.agh.model.RoutingResult;
+import pl.edu.agh.model.SimpleLocationInfo;
+import pl.edu.agh.service.TrafficService;
+import pl.edu.agh.service.TrafficServiceStub;
 import android.content.Context;
 import android.location.Location;
 
@@ -44,7 +51,7 @@ public class RouteProvider {
 	private static final org.apache.commons.logging.Log log = LogUtil.getLog(RouteProvider.class);
 	
 	public enum RouteService {
-		CLOUDMADE("CloudMade"), YOURS("YOURS"), OSMAND("OsmAnd"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		CLOUDMADE("CloudMade"), YOURS("YOURS"), OSMAND("OsmAnd"), AGH("AGH"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		private final String name;
 		private RouteService(String name){
 			this.name = name;
@@ -53,6 +60,14 @@ public class RouteProvider {
 			return name;
 		}
 	}
+	
+	private static final Map<String, String> ERROR_MAPPING = new HashMap<String, String>() {
+		{
+			put(TrafficService.NO_START_ROUTE_ERROR, "Start point is far from allowed road.");
+			put(TrafficService.NO_END_ROUTE_ERROR, "End point is far from allowed road.");
+			put(TrafficService.CALCULATING_ROUTE_ERROR, "Error during route calculating.");
+		}
+	};
 	
 	public RouteProvider(){
 	}
@@ -212,6 +227,9 @@ public class RouteProvider {
 				} else if (type == RouteService.OSMAND) {
 					res = findVectorMapsRoute(start, end, mode, fast, (OsmandApplication)ctx.getApplicationContext());
 					addMissingTurnsToRoute(res, start, end, mode, ctx);
+				} else if (type == RouteService.AGH) {
+					res = findAGHRoute(start, end);
+					addMissingTurnsToRoute(res, start, end, mode, ctx);
 				} else {
 					res = findCloudMadeRoute(start, end, mode, ctx, fast);
 					// for test purpose
@@ -230,6 +248,25 @@ public class RouteProvider {
 			}
 		}
 		return new RouteCalculationResult(null);
+	}
+
+	private RouteCalculationResult findAGHRoute(Location start, LatLon end) {
+		try {
+			RoutingResult result = TrafficServiceStub.INSTANCE.calculateRoute(new SimpleLocationInfo(start.getLongitude(), start.getLatitude()), new SimpleLocationInfo(end.getLongitude(), end.getLatitude()));
+			List<Location> locations = new ArrayList<Location>();
+			for (SimpleLocationInfo info : result.getLocations()) {
+				Location loc = new Location("");
+				loc.setLongitude(info.getLongitude());
+				loc.setLatitude(info.getLatitude());
+				locations.add(loc);
+			}
+			return new RouteCalculationResult(locations, null, start, end, null);
+		} catch (JSONRPCException e) {
+			String exceptionMessage = e.getMessage();
+			String guiMessage = ERROR_MAPPING.containsKey(exceptionMessage) ? ERROR_MAPPING.get(exceptionMessage)
+					: exceptionMessage;
+			return new RouteCalculationResult(guiMessage);
+		}
 	}
 	
 	protected String getString(Context ctx, int resId){

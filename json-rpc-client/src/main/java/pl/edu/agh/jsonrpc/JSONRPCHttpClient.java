@@ -82,9 +82,9 @@ public class JSONRPCHttpClient extends JSONRPCClient {
 		catch (ClientProtocolException e) {
 			throw new JSONRPCException("HTTP error", e);
 		} catch (IOException e) {
-			throw new JSONRPCException("IO error", e);
+			throw new JSONRPCException("Connection error", e);
 		} catch (JSONException e) {
-			throw new JSONRPCException("Invalid JSON response", e);
+			throw new JSONRPCException("Invalid response", e);
 		}
 	}
 }

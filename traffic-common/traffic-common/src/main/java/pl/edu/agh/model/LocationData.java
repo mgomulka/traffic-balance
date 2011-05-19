@@ -2,7 +2,7 @@ package pl.edu.agh.model;
 
 import java.util.List;
 
-public class LocationDataBatch {
+public class LocationData {
 
 	private List<LocationInfo> locationInfos;
 	// tutaj mozliwosc dodania innych pol, np userId
@@ -11,8 +11,7 @@ public class LocationDataBatch {
 		return locationInfos;
 	}
 
-	public LocationDataBatch(List<LocationInfo> locationInfos) {
-		super();
+	public LocationData(List<LocationInfo> locationInfos) {
 		this.locationInfos = locationInfos;
 	}
 

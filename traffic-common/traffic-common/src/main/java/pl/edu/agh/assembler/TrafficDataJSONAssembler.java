@@ -5,21 +5,23 @@ import org.json.JSONObject;
 
 import pl.edu.agh.model.TrafficData;
 
-public class TrafficDataJSONAssembler {
+public class TrafficDataJSONAssembler extends AbstractJSONAssembler<TrafficData> {
 
-	public static JSONObject serialize(TrafficData trafficData) throws JSONException {
-		JSONObject jsonTrafficData = new JSONObject();
+	@Override
+	public JSONObject serialize(TrafficData data) throws JSONException {
+		JSONObject serializedData = new JSONObject();
 
-		jsonTrafficData.put("number", trafficData.getNumber());
+		serializedData.put("number", data.getNumber());
 
-		return jsonTrafficData;
+		return serializedData;
 	}
 
-	public static TrafficData deserialize(JSONObject jsonTrafficData) throws JSONException {
-		TrafficData trafficData = new TrafficData();
+	@Override
+	public TrafficData deserialize(JSONObject serializedData) throws JSONException {
+		TrafficData data = new TrafficData();
 
-		trafficData.setNumber(jsonTrafficData.getInt("number"));
+		data.setNumber(serializedData.getInt("number"));
 
-		return trafficData;
+		return data;
 	}
 }

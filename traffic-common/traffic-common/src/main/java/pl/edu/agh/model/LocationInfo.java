@@ -1,29 +1,11 @@
 package pl.edu.agh.model;
 
-public class LocationInfo {
+public class LocationInfo extends SimpleLocationInfo {
 
-	private double longitude;
-	private double latitude;
 	private long time;
 	private double speed;
 	private double accuracy;
 	private double direction;
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
 
 	public long getTime() {
 		return time;
@@ -56,7 +38,5 @@ public class LocationInfo {
 	public void setDirection(double direction) {
 		this.direction = direction;
 	}
-
-	
 
 }
