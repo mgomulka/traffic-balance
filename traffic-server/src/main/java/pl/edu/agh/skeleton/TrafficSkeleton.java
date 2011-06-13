@@ -50,8 +50,9 @@ public class TrafficSkeleton extends JSONRPCSkeleton {
 	private JSONObject invokeCalculateRoute(JSONArray params) throws JSONException, JSONRPCException {
 		SimpleLocationInfo start = simpleLocationInfoJSONAssembler.deserialize(params.getJSONObject(0));
 		SimpleLocationInfo end = simpleLocationInfoJSONAssembler.deserialize(params.getJSONObject(1));
+		boolean useTrafficDataToRoute = params.getBoolean(2);
 
-		return routingResultJSONAssembler.serialize(trafficService.calculateRoute(start, end));
+		return routingResultJSONAssembler.serialize(trafficService.calculateRoute(start, end, useTrafficDataToRoute));
 	}
 
 	private JSONObject invokeGetTrafficData(JSONArray params) throws JSONException, JSONRPCException {

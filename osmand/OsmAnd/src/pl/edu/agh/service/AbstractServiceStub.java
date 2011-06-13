@@ -10,7 +10,7 @@ public abstract class AbstractServiceStub {
 	protected JSONRPCClient rpcClient;
 	
 	public AbstractServiceStub(String serviceName) {
-		rpcClient = new JSONRPCHttpClient(String.format(SERVICE_URL_TEMPLATE, "192.168.1.45:8080", "traffic-server", serviceName));
+		rpcClient = new JSONRPCHttpClient(String.format(SERVICE_URL_TEMPLATE, "192.168.1.104:8080", "traffic-server", serviceName));
 	}
 
 }

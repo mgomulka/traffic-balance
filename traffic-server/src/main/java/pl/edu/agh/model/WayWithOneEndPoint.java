@@ -13,25 +13,30 @@ import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public class WayWithOneEndPoint extends WayWithEndPoints {
+public abstract class WayWithOneEndPoint extends WayWithEndPoints {
 
-	private Point point;
-	private boolean correctlyDirected;
+	protected Point point;
 
 	public WayWithOneEndPoint(Way way, Point point) {
 		super(way, point.getFactory());
-
-		this.correctlyDirected = (EARTH_DISTANCE_CALCULATOR.distance(way.getStartPoint(), point) < EARTH_DISTANCE_CALCULATOR
-				.distance(way.getEndPoint(), point));
 		this.point = point;
 	}
 
-	public Integer getNearerVertexNumber() {
-		return correctlyDirected ? way.getSource() : way.getTarget();
+	protected Integer getNearerVertexNumber() {
+		return EARTH_DISTANCE_CALCULATOR.distance(way.getStartPoint(), point) < EARTH_DISTANCE_CALCULATOR.distance(
+				way.getEndPoint(), point) ? way.getSource() : way.getTarget();
 	}
-
-	public Integer getFurtherVertexNumber() {
-		return correctlyDirected ? way.getTarget() : way.getSource();
+	
+	public abstract Integer getWayEndPoint();
+	
+	public Integer getWayEndPointOppositeTo(Integer endPoint) {
+		if (endPoint.equals(way.getSource())) {
+			return way.getTarget();
+		} else if (endPoint.equals(way.getTarget())) {
+			return way.getSource();
+		} else {
+			throw new IllegalArgumentException("Passed endPoint is neither start nor end of way");
+		}
 	}
 
 	public List<Point> createRouteFromIndexToPoint(Integer index) {

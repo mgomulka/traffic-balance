@@ -15,6 +15,7 @@ import pl.edu.agh.exception.BusinessException;
 import pl.edu.agh.model.WayWithBothEndPoints;
 import pl.edu.agh.model.WayWithOneEndPoint;
 import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.model.entity.WayWithSpeedInfo;
 import pl.edu.agh.spatial.GeometryHelper;
 import pl.edu.agh.spatial.PointComparator;
 import pl.edu.agh.spatial.WGS84GeometryFactory;
@@ -30,22 +31,25 @@ public class RoutingBOImpl implements RoutingBO {
 
 	@Autowired
 	private WGS84GeometryFactory geometryFactory;
-	
+
+	//@Autowired
+	//private TrafficGenerator trafficGenerator;
+
 	@Autowired
 	private WayWithEndpointsFactory wayWithEndpointsFactory;
 
 	@Transactional
 	@Override
-	public List<Point> calculateRoute(Point start, Point end) throws BusinessException {
+	public List<Point> calculateRoute(Point start, Point end, boolean useTrafficDataToRoute) throws BusinessException {
 		Way startWay = checkNotNull(wayDao.findNearestWay(start), Error.NO_START_ROUTE);
 		Way endWay = checkNotNull(wayDao.findNearestWay(end), Error.NO_END_ROUTE);
 
 		List<Point> route;
-		if (startWay.equals(endWay)) {
+		if (startWay.equals(endWay) && wayWithEndpointsFactory.create(startWay, start, end).isValid()) {
 			route = calculateRouteWithOneWay(wayWithEndpointsFactory.create(startWay, start, end));
 		} else {
-			route = calculateRouteWithManyWays(wayWithEndpointsFactory.create(startWay, start),
-					wayWithEndpointsFactory.create(endWay, end));
+			route = calculateRouteWithManyWays(wayWithEndpointsFactory.createWayWithStartPoint(startWay, start),
+					wayWithEndpointsFactory.createWayWithEndPoint(endWay, end), useTrafficDataToRoute);
 		}
 
 		return Collections.removeAdjacentDuplicates(completeRoute(start, end, route), PointComparator.COMPARATOR);
@@ -57,11 +61,13 @@ public class RoutingBOImpl implements RoutingBO {
 
 	@SuppressWarnings("unchecked")
 	private List<Point> calculateRouteWithManyWays(WayWithOneEndPoint startWayWithPoint,
-			WayWithOneEndPoint endWayWithPoint) {
+			WayWithOneEndPoint endWayWithPoint, boolean useTrafficDataToRoute) {
 		List<Way> route;
 		try {
-			route = wayDao
-					.findRoute(startWayWithPoint.getNearerVertexNumber(), endWayWithPoint.getNearerVertexNumber());
+			route = wayDao.findRoute(startWayWithPoint.getWayEndPoint(),
+					endWayWithPoint.getWayEndPoint(), useTrafficDataToRoute);
+			//trafficGenerator.generate(route);
+
 		} catch (GenericJDBCException ex) {
 			throw new BusinessException(Error.CALCULATING_ERROR);
 		}
@@ -79,10 +85,10 @@ public class RoutingBOImpl implements RoutingBO {
 	private Integer removeWayFromRouteIfExists(WayWithOneEndPoint wayWithPoint, List<Way> route) {
 		if (route.contains(wayWithPoint.getWay())) {
 			route.remove(wayWithPoint.getWay());
-			return wayWithPoint.getFurtherVertexNumber();
+			return wayWithPoint.getWayEndPointOppositeTo(wayWithPoint.getWayEndPoint());
 		}
 
-		return wayWithPoint.getNearerVertexNumber();
+		return wayWithPoint.getWayEndPoint();
 	}
 
 	private List<Point> normalizeRoute(Integer startVertexNumber, Integer endVertexNumber, List<Way> route) {
@@ -108,5 +114,11 @@ public class RoutingBOImpl implements RoutingBO {
 		route.add(end);
 
 		return route;
+	}
+
+	@Transactional
+	@Override
+	public List<WayWithSpeedInfo> getTrafficData(Point point) {
+		return wayDao.getTrafficData(point);
 	}
 }

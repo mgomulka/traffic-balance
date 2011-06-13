@@ -14,6 +14,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.model.entity.WayWithSpeedInfo;
 import pl.edu.agh.spatial.WGS84GeometryFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,7 +38,13 @@ public class WayDaoTest {
 	
 	@Test
 	public void canCalculateRoute() {
-		List<Way> route = wayDao.findRoute(119, 133);
+		List<Way> route = wayDao.findRoute(119, 133, true);
 		assertFalse(route.isEmpty());
+	}
+	
+	@Test
+	public void canReadTrafficInfo() {
+		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(19.9245182, 50.0651936));
+		assertFalse(trafficInfo.isEmpty());
 	}
 }

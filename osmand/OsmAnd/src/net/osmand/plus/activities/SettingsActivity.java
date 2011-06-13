@@ -114,6 +114,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			new BooleanPreference(OsmandSettings.USE_TRACKBALL_FOR_MOVEMENTS, OsmandSettings.USE_TRACKBALL_FOR_MOVEMENTS_DEF),
 			new BooleanPreference(OsmandSettings.USE_HIGH_RES_MAPS, OsmandSettings.USE_HIGH_RES_MAPS_DEF),
 			new BooleanPreference(OsmandSettings.USE_ENGLISH_NAMES, OsmandSettings.USE_ENGLISH_NAMES_DEF),
+			new BooleanPreference(OsmandSettings.USE_TRAFFIC_DATA_TO_ROUTE, OsmandSettings.USE_TRAFFIC_DATA_TO_ROUTE_DEF),
 			new BooleanPreference(OsmandSettings.AUTO_ZOOM_MAP, OsmandSettings.AUTO_ZOOM_MAP_DEF),
 			new BooleanPreference(OsmandSettings.SAVE_TRACK_TO_GPX, OsmandSettings.SAVE_TRACK_TO_GPX_DEF),
 			new BooleanPreference(OsmandSettings.DEBUG_RENDERING_INFO, OsmandSettings.DEBUG_RENDERING_INFO_DEF),

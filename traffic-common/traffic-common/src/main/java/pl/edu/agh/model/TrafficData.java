@@ -1,16 +1,17 @@
 package pl.edu.agh.model;
 
+import java.util.List;
+
 public class TrafficData {
 
-	// do testow komunikacji
-	private int number;
+	private List<TrafficInfo> trafficInfos;
 
-	public int getNumber() {
-		return number;
+	public TrafficData(List<TrafficInfo> trafficInfos) {
+		this.trafficInfos = trafficInfos;
 	}
 
-	public void setNumber(int number) {
-		this.number = number;
+	public List<TrafficInfo> getTrafficInfos() {
+		return trafficInfos;
 	}
 
 }

@@ -18,6 +18,7 @@ public interface TrafficService {
 
 	public TrafficData getTrafficData(SimpleLocationInfo location) throws JSONRPCException;
 
-	public RoutingResult calculateRoute(SimpleLocationInfo start, SimpleLocationInfo end) throws JSONRPCException;
+	public RoutingResult calculateRoute(SimpleLocationInfo start, SimpleLocationInfo end, boolean useTrafficDataToRoute)
+			throws JSONRPCException;
 
 }

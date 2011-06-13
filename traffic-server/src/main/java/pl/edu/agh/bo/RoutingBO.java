@@ -3,6 +3,7 @@ package pl.edu.agh.bo;
 import java.util.List;
 
 import pl.edu.agh.exception.BusinessException;
+import pl.edu.agh.model.entity.WayWithSpeedInfo;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -12,5 +13,6 @@ public interface RoutingBO {
 		NO_START_ROUTE, NO_END_ROUTE, CALCULATING_ERROR;
 	}
 
-	public List<Point> calculateRoute(Point start, Point end) throws BusinessException;
+	public List<Point> calculateRoute(Point start, Point end, boolean useTrafficDataToRoute) throws BusinessException;
+	public List<WayWithSpeedInfo> getTrafficData(Point point);
 }

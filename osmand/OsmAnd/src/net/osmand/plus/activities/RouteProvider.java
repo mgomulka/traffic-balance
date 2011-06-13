@@ -26,6 +26,7 @@ import net.osmand.binary.BinaryRouteDataReader.RouteSegmentResult;
 import net.osmand.binary.BinaryRouteDataReader.RoutingContext;
 import net.osmand.osm.LatLon;
 import net.osmand.osm.MapUtils;
+import net.osmand.plus.OsmandSettings;
 import net.osmand.plus.OsmandSettings.ApplicationMode;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.RoutingHelper.RouteDirectionInfo;
@@ -228,7 +229,7 @@ public class RouteProvider {
 					res = findVectorMapsRoute(start, end, mode, fast, (OsmandApplication)ctx.getApplicationContext());
 					addMissingTurnsToRoute(res, start, end, mode, ctx);
 				} else if (type == RouteService.AGH) {
-					res = findAGHRoute(start, end);
+					res = findAGHRoute(start, end, ctx);
 					addMissingTurnsToRoute(res, start, end, mode, ctx);
 				} else {
 					res = findCloudMadeRoute(start, end, mode, ctx, fast);
@@ -250,16 +251,14 @@ public class RouteProvider {
 		return new RouteCalculationResult(null);
 	}
 
-	private RouteCalculationResult findAGHRoute(Location start, LatLon end) {
+	private RouteCalculationResult findAGHRoute(Location start, LatLon end, Context ctx) {
 		try {
-			RoutingResult result = TrafficServiceStub.INSTANCE.calculateRoute(new SimpleLocationInfo(start.getLongitude(), start.getLatitude()), new SimpleLocationInfo(end.getLongitude(), end.getLatitude()));
-			List<Location> locations = new ArrayList<Location>();
-			for (SimpleLocationInfo info : result.getLocations()) {
-				Location loc = new Location("");
-				loc.setLongitude(info.getLongitude());
-				loc.setLatitude(info.getLatitude());
-				locations.add(loc);
-			}
+			boolean useTrafficDataToRoute = OsmandSettings.usingTrafficDataToRoute(ctx);
+
+			RoutingResult result = TrafficServiceStub.getInstance().calculateRoute(
+					new SimpleLocationInfo(start.getLongitude(), start.getLatitude()),
+					new SimpleLocationInfo(end.getLongitude(), end.getLatitude()), useTrafficDataToRoute);
+			List<Location> locations = retrieveLocationList(result);
 			return new RouteCalculationResult(locations, null, start, end, null);
 		} catch (JSONRPCException e) {
 			String exceptionMessage = e.getMessage();
@@ -267,6 +266,17 @@ public class RouteProvider {
 					: exceptionMessage;
 			return new RouteCalculationResult(guiMessage);
 		}
+	}
+
+	private List<Location> retrieveLocationList(RoutingResult result) {
+		List<Location> locations = new ArrayList<Location>();
+		for (SimpleLocationInfo info : result.getLocations()) {
+			Location loc = new Location("");
+			loc.setLongitude(info.getLongitude());
+			loc.setLatitude(info.getLatitude());
+			locations.add(loc);
+		}
+		return locations;
 	}
 	
 	protected String getString(Context ctx, int resId){

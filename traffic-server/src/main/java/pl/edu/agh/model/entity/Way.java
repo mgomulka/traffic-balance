@@ -3,8 +3,12 @@ package pl.edu.agh.model.entity;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -18,13 +22,19 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 
 @Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = Way.COL_DISCRIMINATOR)
+@DiscriminatorValue(Way.DISCRIMINATOR_VALUE)
 @Table(name = Way.TABLE_NAME)
 @Immutable
 public class Way implements Serializable {
 
 	public static final String TABLE_NAME = "ways";
-	public static final String VIEW_NAME = "ways_with_costs";
+	public static final String WAYS_WITH_LENGTH_COSTS_VIEW_NAME = "ways_with_length_costs";
+	public static final String WAYS_WITH_TRAFFIC_COSTS_VIEW_NAME = "ways_with_traffic_costs";
+	public static final String DISCRIMINATOR_VALUE = "1";
 
+	public static final String COL_DISCRIMINATOR = "discriminator";
 	public static final String COL_GID = "gid";
 	public static final String COL_CLASS_ID = "class_id";
 	public static final String COL_LENGTH = "length";
@@ -141,6 +151,12 @@ public class Way implements Serializable {
 	@Transient
 	public Point getEndPoint() {
 		return getLineString().getEndPoint();
+	}
+	
+	
+	@Transient
+	public boolean isOneWay() {
+		return length != reverseCost;
 	}
 
 	@Override

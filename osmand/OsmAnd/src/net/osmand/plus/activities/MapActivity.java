@@ -44,6 +44,7 @@ import net.osmand.plus.activities.search.SearchPoiFilterActivity;
 import net.osmand.plus.activities.search.SearchTransportActivity;
 import net.osmand.plus.render.MapRenderRepositories;
 import net.osmand.plus.render.RendererLayer;
+import net.osmand.plus.views.AGHTrafficLayer;
 import net.osmand.plus.views.AnimateDraggingMapThread;
 import net.osmand.plus.views.ContextMenuLayer;
 import net.osmand.plus.views.FavoritesLayer;
@@ -155,6 +156,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 	private MapInfoLayer mapInfoLayer;
 	private ContextMenuLayer contextMenuLayer;
 	private RouteInfoLayer routeInfoLayer;
+	private AGHTrafficLayer aghTrafficLayer;
 	
 	private SavingTrackHelper savingTrackHelper;
 	private RoutingHelper routingHelper;
@@ -247,6 +249,10 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		// 0.6 gpx layer
 		gpxLayer = new GPXLayer();
 		mapView.addLayer(gpxLayer, 0.6f);
+		
+		//0.8 agh traffic layer
+		aghTrafficLayer = new AGHTrafficLayer();
+		mapView.addLayer(aghTrafficLayer, 0.8f);
 		
 		// 1. route layer
 		routeLayer = new RouteLayer(routingHelper);
@@ -779,6 +785,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 			}
 		}
 		trafficLayer.setVisible(OsmandSettings.isShowingYandexTraffic(settings));
+		aghTrafficLayer.setVisible(OsmandSettings.isShowingAghTraffic(settings));
 	}
 	
 	private void updateMapSource(){
@@ -1340,6 +1347,8 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		layersList.add(getString(R.string.layer_osm_bugs));
 		layersList.add(getString(R.string.layer_favorites));
 		layersList.add(getString(R.string.layer_gpx_layer));
+		layersList.add(getString(R.string.layer_agh_traffic));
+		
 		final int routeInfoInd = routeInfoLayer.couldBeVisible() ? layersList.size() : -1;
 		if(routeInfoLayer.couldBeVisible()){
 			layersList.add(getString(R.string.layer_route));
@@ -1348,8 +1357,6 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		if(transportRouteInfoInd > -1){
 			layersList.add(getString(R.string.layer_transport_route));
 		}
-		final int trafficInd = layersList.size();
-		layersList.add(getString(R.string.layer_yandex_traffic));
 		
 		final boolean[] selected = new boolean[layersList.size()];
 		Arrays.fill(selected, true);
@@ -1358,7 +1365,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		selected[3] = OsmandSettings.isShowingOsmBugs(settings);
 		selected[4] = OsmandSettings.isShowingFavorites(settings);
 		selected[5] = gpxLayer.isVisible();
-		selected[trafficInd] = trafficLayer.isVisible();
+		selected[6] = OsmandSettings.isShowingAghTraffic(settings);
 		if(routeInfoInd != -1){
 			selected[routeInfoInd] = routeInfoLayer.isUserDefinedVisible(); 
 		}
@@ -1393,13 +1400,13 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 						dialog.dismiss();
 						useGPXFileLayer(false, null);
 					}
+				} else if (item == 6) {
+					OsmandSettings.setShowingAghTraffic(MapActivity.this, isChecked);
 				} else if(item == routeInfoInd){
 					routeInfoLayer.setVisible(isChecked);
 				} else if(item == transportRouteInfoInd){
 					transportInfoLayer.setVisible(isChecked);
-				} else if(item == trafficInd){
-					OsmandSettings.setShowingYandexTraffic(MapActivity.this, isChecked);
-				}
+				} 
 				updateLayers();
 				mapView.refreshMap();
 			}

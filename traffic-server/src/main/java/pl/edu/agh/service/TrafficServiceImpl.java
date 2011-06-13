@@ -5,11 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.Point;
-
 import pl.edu.agh.bo.RoutingBO;
 import pl.edu.agh.bo.RoutingBO.Error;
 import pl.edu.agh.exception.BusinessException;
@@ -17,7 +12,15 @@ import pl.edu.agh.jsonrpc.JSONRPCException;
 import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
+import pl.edu.agh.model.TrafficInfo;
+import pl.edu.agh.model.entity.WayWithSpeedInfo;
+import pl.edu.agh.spatial.GeometryHelper;
 import pl.edu.agh.spatial.WGS84GeometryFactory;
+
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.vividsolutions.jts.geom.Point;
 
 @Component
 public class TrafficServiceImpl implements TrafficService {
@@ -33,11 +36,12 @@ public class TrafficServiceImpl implements TrafficService {
 	WGS84GeometryFactory geometryFactory;
 
 	@Override
-	public RoutingResult calculateRoute(SimpleLocationInfo start, SimpleLocationInfo end) throws JSONRPCException {
+	public RoutingResult calculateRoute(SimpleLocationInfo start, SimpleLocationInfo end, boolean useTrafficDataToRoute)
+			throws JSONRPCException {
 		try {
 			List<Point> points = routingBO.calculateRoute(
 					geometryFactory.createPoint(start.getLongitude(), start.getLatitude()),
-					geometryFactory.createPoint(end.getLongitude(), end.getLatitude()));
+					geometryFactory.createPoint(end.getLongitude(), end.getLatitude()), useTrafficDataToRoute);
 			return new RoutingResult(transformPointsToInfos(points));
 		} catch (BusinessException ex) {
 			throw new JSONRPCException(ROUTING_ERROR_MAPPING.get(ex.getError()), ex);
@@ -57,9 +61,25 @@ public class TrafficServiceImpl implements TrafficService {
 
 	@Override
 	public TrafficData getTrafficData(SimpleLocationInfo location) throws JSONRPCException {
-		TrafficData td = new TrafficData();
-		td.setNumber(7);
-		return td;
+		List<WayWithSpeedInfo> ways = routingBO.getTrafficData(geometryFactory.createPoint(location.getLongitude(),
+				location.getLatitude()));
+
+		List<TrafficInfo> trafficInfos = transformWaysToTrafficInfos(ways);
+
+		return new TrafficData(trafficInfos);
+	}
+
+	private List<TrafficInfo> transformWaysToTrafficInfos(List<WayWithSpeedInfo> ways) {
+		List<TrafficInfo> trafficInfos = Lists.transform(ways, new Function<WayWithSpeedInfo, TrafficInfo>() {
+
+			@Override
+			public TrafficInfo apply(WayWithSpeedInfo way) {
+				List<SimpleLocationInfo> points = transformPointsToInfos(GeometryHelper.getPointsFromGeometry(
+						way.getLineString(), geometryFactory));
+				return new TrafficInfo(points, way.getDirectWaySpeed(), way.getReverseWaySpeed());
+			}
+		});
+		return trafficInfos;
 	}
 
 }

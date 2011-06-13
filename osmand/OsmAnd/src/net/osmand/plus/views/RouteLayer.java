@@ -43,7 +43,7 @@ public class RouteLayer implements OsmandMapLayer {
 		paint.setColor(Color.BLUE);
 		paint.setStyle(Style.STROKE);
 		paint.setStrokeWidth(14);
-		paint.setAlpha(150);
+		paint.setAlpha(100);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Cap.ROUND);
 		paint.setStrokeJoin(Join.ROUND);

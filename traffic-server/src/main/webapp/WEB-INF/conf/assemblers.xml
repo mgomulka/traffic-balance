@@ -21,6 +21,12 @@
 		<constructor-arg ref="simpleLocationInfoJSONAssembler" />
 	</bean>
 
-	<bean name="trafficDataJSONAssembler" class="pl.edu.agh.assembler.TrafficDataJSONAssembler" />
+	<bean name="trafficDataJSONAssembler" class="pl.edu.agh.assembler.TrafficDataJSONAssembler">
+		<constructor-arg ref="trafficInfoJSONAssembler" />
+	</bean>
+	
+	<bean name="trafficInfoJSONAssembler" class="pl.edu.agh.assembler.TrafficInfoJSONAssembler">
+		<constructor-arg ref="simpleLocationInfoJSONAssembler" />
+	</bean>
 
 </beans>
