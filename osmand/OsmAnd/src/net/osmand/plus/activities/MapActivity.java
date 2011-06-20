@@ -252,7 +252,6 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		
 		//0.8 agh traffic layer
 		aghTrafficLayer = new AGHTrafficLayer();
-		mapView.addLayer(aghTrafficLayer, 0.8f);
 		
 		// 1. route layer
 		routeLayer = new RouteLayer(routingHelper);
@@ -466,6 +465,9 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     		mNotificationManager.cancel(APP_NOTIFICATION_ID);
     	}
     	MapTileDownloader.getInstance().removeDownloaderCallback(mapView);
+    	if(mapView.getLayers().contains(aghTrafficLayer)) {
+    		mapView.removeLayer(aghTrafficLayer);
+    	}
     }
     
     
@@ -784,8 +786,14 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				mapView.removeLayer(favoritesLayer);
 			}
 		}
+		if(mapView.getLayers().contains(aghTrafficLayer) != OsmandSettings.isShowingAghTraffic(settings)){
+			if(OsmandSettings.isShowingAghTraffic(settings)){
+				mapView.addLayer(aghTrafficLayer, 0.8f);
+			} else {
+				mapView.removeLayer(aghTrafficLayer);
+			}
+		}
 		trafficLayer.setVisible(OsmandSettings.isShowingYandexTraffic(settings));
-		aghTrafficLayer.setVisible(OsmandSettings.isShowingAghTraffic(settings));
 	}
 	
 	private void updateMapSource(){

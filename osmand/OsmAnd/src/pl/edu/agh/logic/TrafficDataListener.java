@@ -1,4 +1,4 @@
-package pl.edu.agh.cache;
+package pl.edu.agh.logic;
 
 import pl.edu.agh.model.TrafficData;
 

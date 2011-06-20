@@ -68,6 +68,8 @@ public class JSONRPCHttpClient extends JSONRPCClient {
 			HttpResponse response = httpClient.execute(request);
 			String responseString = EntityUtils.toString(response.getEntity());
 			responseString = responseString.trim();
+			System.out.println("Rozmiar odpowiedzi: " + responseString.length());
+			System.out.println("Odzpowiedz : " + responseString); 
 			JSONObject jsonResponse = new JSONObject(responseString);
 
 			// Check for remote errors

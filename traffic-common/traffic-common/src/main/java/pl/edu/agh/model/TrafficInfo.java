@@ -26,4 +26,8 @@ public class TrafficInfo {
 		this.reverseWaySpeed = reverseWaySpeed;
 	}
 
+	public boolean isOneWay() {
+		return reverseWaySpeed == null;
+	}
+
 }

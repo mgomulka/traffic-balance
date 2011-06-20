@@ -8,6 +8,8 @@ import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 
+import pl.edu.agh.logic.TrafficDataProvider;
+
 import net.osmand.Algoritms;
 import net.osmand.LogUtil;
 import net.osmand.plus.FavouritesDbHelper;
@@ -38,7 +40,7 @@ public class OsmandApplication extends Application {
 	RoutingHelper routingHelper = null;
 	FavouritesDbHelper favorites = null;
 	CommandPlayer player = null;
-	
+	TrafficDataProvider trafficDataProvider;
 	
 	// start variables
 	private ProgressDialogImplementation startDialog;
@@ -52,6 +54,7 @@ public class OsmandApplication extends Application {
     public void	onCreate(){
     	super.onCreate();
     	routingHelper = new RoutingHelper(OsmandSettings.getApplicationMode(OsmandSettings.getPrefs(OsmandApplication.this)), OsmandApplication.this, player);
+    	trafficDataProvider = new TrafficDataProvider();
     	manager = new ResourceManager(this);
     	daynightHelper = new DayNightHelper(this);
     	uiHandler = new Handler();
@@ -105,6 +108,10 @@ public class OsmandApplication extends Application {
 	
 	public RoutingHelper getRoutingHelper() {
 		return routingHelper;
+	}
+	
+	public TrafficDataProvider getTrafficDataProvider() {
+		return trafficDataProvider;
 	}
 	
 	public CommandPlayer getPlayer() {

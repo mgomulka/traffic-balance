@@ -3,6 +3,7 @@ package pl.edu.agh.bo;
 import static com.google.common.collect.Lists.newArrayList;
 import static pl.edu.agh.utils.Preconditions.checkNotNull;
 
+import java.awt.RadialGradientPaint;
 import java.util.List;
 
 import org.hibernate.exception.GenericJDBCException;
@@ -118,7 +119,7 @@ public class RoutingBOImpl implements RoutingBO {
 
 	@Transactional
 	@Override
-	public List<WayWithSpeedInfo> getTrafficData(Point point) {
-		return wayDao.getTrafficData(point);
+	public List<WayWithSpeedInfo> getTrafficData(Point point, double radius) {
+		return wayDao.getTrafficData(point, radius);
 	}
 }

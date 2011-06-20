@@ -44,7 +44,7 @@ public class WayDaoTest {
 	
 	@Test
 	public void canReadTrafficInfo() {
-		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(19.9245182, 50.0651936));
+		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(19.9245182, 50.0651936), 0.1);
 		assertFalse(trafficInfo.isEmpty());
 	}
 }

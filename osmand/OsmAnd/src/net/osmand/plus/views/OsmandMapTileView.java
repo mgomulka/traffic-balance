@@ -347,6 +347,10 @@ public class OsmandMapTileView extends SurfaceView implements IMapDownloaderCall
 	public int getZoom() {
 		return (int) zoom;
 	}
+	
+	public double getRealZoom() {
+		return zoom;
+	}
 
 	public boolean isZooming(){
 		return zoom != getZoom();

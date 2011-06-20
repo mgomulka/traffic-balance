@@ -251,7 +251,7 @@ public class RouteProvider {
 		return new RouteCalculationResult(null);
 	}
 
-	private RouteCalculationResult findAGHRoute(Location start, LatLon end, Context ctx) {
+	protected RouteCalculationResult findAGHRoute(Location start, LatLon end, Context ctx) {
 		try {
 			boolean useTrafficDataToRoute = OsmandSettings.usingTrafficDataToRoute(ctx);
 

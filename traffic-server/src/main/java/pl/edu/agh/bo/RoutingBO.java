@@ -14,5 +14,5 @@ public interface RoutingBO {
 	}
 
 	public List<Point> calculateRoute(Point start, Point end, boolean useTrafficDataToRoute) throws BusinessException;
-	public List<WayWithSpeedInfo> getTrafficData(Point point);
+	public List<WayWithSpeedInfo> getTrafficData(Point point, double radius);
 }

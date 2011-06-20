@@ -45,10 +45,10 @@ public class TrafficServiceStub extends AbstractServiceStub implements TrafficSe
 	}
 
 	@Override
-	public TrafficData getTrafficData(SimpleLocationInfo location) throws JSONRPCException {
+	public TrafficData getTrafficData(SimpleLocationInfo location, double radius) throws JSONRPCException {
 		try {
 			JSONObject serializedLocation = simpleLocationInfoJSONAssembler.serialize(location);
-			JSONObject serializedData = rpcClient.callJSONObject(GET_TRAFFIC_DATA_METHOD, serializedLocation);
+			JSONObject serializedData = rpcClient.callJSONObject(GET_TRAFFIC_DATA_METHOD, serializedLocation, radius);
 			return trafficDataJSONAssembler.deserialize(serializedData);
 		} catch (JSONException ex) {
 			throw new JSONRPCException("Error during (de)serialization", ex);

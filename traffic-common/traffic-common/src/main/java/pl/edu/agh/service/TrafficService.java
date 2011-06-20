@@ -16,7 +16,7 @@ public interface TrafficService {
 	public static final String NO_END_ROUTE_ERROR = "noEndRoute";
 	public static final String CALCULATING_ROUTE_ERROR = "calculatingError";
 
-	public TrafficData getTrafficData(SimpleLocationInfo location) throws JSONRPCException;
+	public TrafficData getTrafficData(SimpleLocationInfo location, double radius) throws JSONRPCException;
 
 	public RoutingResult calculateRoute(SimpleLocationInfo start, SimpleLocationInfo end, boolean useTrafficDataToRoute)
 			throws JSONRPCException;

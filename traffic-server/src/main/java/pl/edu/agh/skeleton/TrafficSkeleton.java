@@ -57,8 +57,8 @@ public class TrafficSkeleton extends JSONRPCSkeleton {
 
 	private JSONObject invokeGetTrafficData(JSONArray params) throws JSONException, JSONRPCException {
 		SimpleLocationInfo location = simpleLocationInfoJSONAssembler.deserialize(params.getJSONObject(0));
-
-		return trafficDataJSONAssembler.serialize(trafficService.getTrafficData(location));
+		double radius = params.getDouble(1);
+		return trafficDataJSONAssembler.serialize(trafficService.getTrafficData(location, radius));
 	}
 
 }

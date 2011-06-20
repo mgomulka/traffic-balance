@@ -60,9 +60,9 @@ public class TrafficServiceImpl implements TrafficService {
 	}
 
 	@Override
-	public TrafficData getTrafficData(SimpleLocationInfo location) throws JSONRPCException {
+	public TrafficData getTrafficData(SimpleLocationInfo location, double radius) throws JSONRPCException {
 		List<WayWithSpeedInfo> ways = routingBO.getTrafficData(geometryFactory.createPoint(location.getLongitude(),
-				location.getLatitude()));
+				location.getLatitude()), radius);
 
 		List<TrafficInfo> trafficInfos = transformWaysToTrafficInfos(ways);
 

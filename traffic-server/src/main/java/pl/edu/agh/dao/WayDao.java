@@ -13,5 +13,5 @@ public interface WayDao {
 	
 	public List<Way> findRoute(Integer startIndex, Integer endIndex, boolean useTrafficDataToRoute);
 	
-	public List<WayWithSpeedInfo> getTrafficData(Point point);
+	public List<WayWithSpeedInfo> getTrafficData(Point point, double radius);
 }
