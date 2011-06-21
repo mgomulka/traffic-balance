@@ -3,7 +3,6 @@ package pl.edu.agh.bo;
 import static com.google.common.collect.Lists.newArrayList;
 import static pl.edu.agh.utils.Preconditions.checkNotNull;
 
-import java.awt.RadialGradientPaint;
 import java.util.List;
 
 import org.hibernate.exception.GenericJDBCException;

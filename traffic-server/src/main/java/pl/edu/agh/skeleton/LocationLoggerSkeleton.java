@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import pl.edu.agh.assembler.LocationDataJSONAssembler;
+import pl.edu.agh.assembler.RoutingResultJSONAssembler;
 import pl.edu.agh.jsonrpc.JSONRPCException;
 import pl.edu.agh.jsonrpc.JSONRPCSkeleton;
 import pl.edu.agh.model.LocationData;
+import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.service.LocationLoggerService;
 
 @Component(LocationLoggerSkeleton.BEAN_NAME)
@@ -24,6 +26,9 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 
 	@Autowired
 	private LocationDataJSONAssembler locationDataJSONAssembler;
+	
+	@Autowired
+	private RoutingResultJSONAssembler routingResultJSONAssembler;
 
 	@Override
 	protected JSONObject invoke(String methodName, JSONArray params) throws JSONException, JSONRPCException,
@@ -39,9 +44,9 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 	private JSONObject invokeSendLocationData(JSONArray params) throws JSONRPCException, JSONException {
 		LocationData locationData = locationDataJSONAssembler.deserialize(params.getJSONObject(0));
 
-		locationLoggerService.sendLocationData(locationData);
+		RoutingResult rr = locationLoggerService.sendLocationData(locationData);
 
-		return NULL_RESULT;
+		return routingResultJSONAssembler.serialize(rr);
 	}
 
 }

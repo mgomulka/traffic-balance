@@ -8,9 +8,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.osmand.plus.OsmandSettings;
+import pl.edu.agh.logic.LocationBuffer;
 import pl.edu.agh.logic.TrafficDataListener;
 import pl.edu.agh.logic.TrafficDataProvider;
 import pl.edu.agh.logic.TrafficDataProvider.Status;
+import pl.edu.agh.model.LocationInfo;
 import pl.edu.agh.model.RectD;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
@@ -100,6 +102,29 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 			if (GeometryUtils.existsPointInsideRect(trafficInfo.getWay(), extendedBound)) {
 				drawTrafficInfo(trafficInfo, canvas);
 			}
+		}
+		
+		// for test only
+		List<LocationInfo> locations = LocationBuffer.INSTANCE.getLocations();
+		if (locations != null) {
+			for (LocationInfo location : locations) {
+				int x = view.getMapXForPoint(location.getLongitude());
+				int y = view.getMapYForPoint(location.getLatitude());
+				Paint paint = getPaintForSpeed(0.0);
+				paint.setColor(Color.BLUE);
+				paint.setStrokeWidth(30);
+				canvas.drawPoint(x, y, paint);
+			}
+		}
+		
+		List<SimpleLocationInfo> calc = LocationBuffer.INSTANCE.getCalculatedRoute();
+		if (calc != null) {
+			Path calcPath = createPathFromPoints(calc);
+			Paint paint = getPaintForSpeed(0.0);
+			paint.setColor(Color.MAGENTA);
+			paint.setAlpha(100);
+			paint.setStrokeWidth(25);
+			canvas.drawPath(calcPath, paint);
 		}
 
 	}

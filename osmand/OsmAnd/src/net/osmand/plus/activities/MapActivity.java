@@ -14,11 +14,11 @@ import java.util.Map;
 import net.osmand.Algoritms;
 import net.osmand.FavouritePoint;
 import net.osmand.GPXUtilities;
+import net.osmand.GPXUtilities.GPXFileResult;
+import net.osmand.GPXUtilities.WptPt;
 import net.osmand.LogUtil;
 import net.osmand.OsmAndFormatter;
 import net.osmand.Version;
-import net.osmand.GPXUtilities.GPXFileResult;
-import net.osmand.GPXUtilities.WptPt;
 import net.osmand.data.Amenity;
 import net.osmand.data.AmenityType;
 import net.osmand.data.preparation.MapTileDownloader;
@@ -33,12 +33,12 @@ import net.osmand.plus.AmenityIndexRepositoryOdb;
 import net.osmand.plus.BusyIndicator;
 import net.osmand.plus.FavouritesDbHelper;
 import net.osmand.plus.OsmandSettings;
+import net.osmand.plus.OsmandSettings.ApplicationMode;
 import net.osmand.plus.PoiFilter;
 import net.osmand.plus.PoiFiltersHelper;
 import net.osmand.plus.R;
 import net.osmand.plus.ResourceManager;
 import net.osmand.plus.SQLiteTileSource;
-import net.osmand.plus.OsmandSettings.ApplicationMode;
 import net.osmand.plus.activities.search.SearchActivity;
 import net.osmand.plus.activities.search.SearchPoiFilterActivity;
 import net.osmand.plus.activities.search.SearchTransportActivity;
@@ -60,14 +60,16 @@ import net.osmand.plus.views.RouteLayer;
 import net.osmand.plus.views.TransportInfoLayer;
 import net.osmand.plus.views.TransportStopsLayer;
 import net.osmand.plus.views.YandexTrafficLayer;
+import pl.edu.agh.logic.LocationBuffer;
+import pl.edu.agh.model.LocationInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -107,8 +109,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -1025,6 +1027,10 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     		final Intent settings = new Intent(MapActivity.this, SettingsActivity.class);
 			startActivity(settings);
     		return true;
+		} else if (item.getItemId() == R.id.map_menu_send_points) {
+			// for test only
+			LocationBuffer.INSTANCE.sendLocations();
+			return true;
 		} else if (item.getItemId() == R.id.map_where_am_i) {
 			backToLocationImpl();
         	return true;
@@ -1646,6 +1652,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     	}
     	final int[] contextMenuStandardActions = new int[]{
     			R.string.context_menu_item_navigate_point,
+    			R.string.context_menu_item_select_for_agh,
     			R.string.context_menu_item_search_poi,
     			R.string.context_menu_item_show_route,
     			R.string.context_menu_item_search_transport,
@@ -1672,6 +1679,16 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				int standardId = contextMenuStandardActions[which - sizeAdditional];
 				if(standardId == R.string.context_menu_item_navigate_point){
 					navigateToPoint(new LatLon(latitude, longitude));
+				} else if (standardId == R.string.context_menu_item_select_for_agh) {
+					// for test only
+					LocationInfo loc = new LocationInfo();
+					loc.setAccuracy(0.0);
+					loc.setDirection(0.0);
+					loc.setLatitude(latitude);
+					loc.setLongitude(longitude);
+					loc.setSpeed(0.0);
+					loc.setTime(0);
+					LocationBuffer.INSTANCE.addLocation(loc);
 				} else if(standardId == R.string.context_menu_item_search_poi){
 					Intent intent = new Intent(MapActivity.this, SearchPoiFilterActivity.class);
 					intent.putExtra(SearchPoiFilterActivity.SEARCH_LAT, latitude);
