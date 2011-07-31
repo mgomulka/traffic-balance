@@ -5,14 +5,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.hibernate.SQLQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import pl.edu.agh.model.entity.Way;
-import pl.edu.agh.model.entity.WayWithSpeedInfo;
-import pl.edu.agh.spatial.WGS84GeometryFactory;
+import pl.edu.agh.model.Way;
+import pl.edu.agh.model.WayWithSpeedInfo;
+import pl.edu.agh.spatial.GeometryHelper;
+import pl.edu.agh.spatial.SpatialTypes;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -34,8 +33,6 @@ public class WayHibernateDao extends AbstractDao implements WayDao {
 	private static final double SECONDARY_RADIUS = 0.04311873;
 	private static final double TETRIARY_RADIUS = 0.021559365;
 	
-	@Autowired
-	private WGS84GeometryFactory geometryFactory;
 
 	@Override
 	public Way findNearestWay(Point point) {
@@ -44,17 +41,11 @@ public class WayHibernateDao extends AbstractDao implements WayDao {
 						+ " as way where the_geom && :box order by ST_Distance(the_geom, :point)");
 		query.setMaxResults(1);
 		query.setParameter("point", point, SpatialTypes.GEOMETRY);
-		query.setParameter("box", getExtendedBoundingBox(point, BOUNDING_BOX_SIZE), SpatialTypes.GEOMETRY);
+		query.setParameter("box", GeometryHelper.getExpandedEnvelopeAsGeometry(point, BOUNDING_BOX_SIZE), SpatialTypes.GEOMETRY);
 
 		query.addEntity("way", Way.class);
 
 		return (Way) query.uniqueResult();
-	}
-
-	private Geometry getExtendedBoundingBox(Point point, double boxSize) {
-		Envelope envelope = point.getEnvelopeInternal();
-		envelope.expandBy(boxSize);
-		return geometryFactory.toGeometry(envelope);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,7 +86,7 @@ public class WayHibernateDao extends AbstractDao implements WayDao {
 								+ " as discriminator from "
 								+ Way.TABLE_NAME
 								+ " as way inner join traffic_info as traffic on way.gid = traffic.way_gid where way.the_geom && :box" + getWayClassCondition(radius));
-		query.setParameter("box", getExtendedBoundingBox(point, radius), SpatialTypes.GEOMETRY);
+		query.setParameter("box", GeometryHelper.getExpandedEnvelopeAsGeometry(point, radius), SpatialTypes.GEOMETRY);
 
 		query.addEntity("way", WayWithSpeedInfo.class);
 
@@ -115,6 +106,19 @@ public class WayHibernateDao extends AbstractDao implements WayDao {
 					+ " or way.class_id = " + ROUNDABOUNT_CLASS_ID + ")";
 		}
 		return EMPTY;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Way> getWaysInsideBox(Geometry box) {
+		SQLQuery query = getCurrentSession().createSQLQuery(
+				"select way.*, " + Way.DISCRIMINATOR_VALUE + " as discriminator from " + Way.TABLE_NAME
+						+ " as way where the_geom && :box");
+		query.setParameter("box", box, SpatialTypes.GEOMETRY);
+
+		query.addEntity("way", Way.class);
+
+		return (List<Way>) query.list();
 	}
 
 }

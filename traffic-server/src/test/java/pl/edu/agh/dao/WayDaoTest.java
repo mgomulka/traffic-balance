@@ -13,9 +13,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import pl.edu.agh.model.entity.Way;
-import pl.edu.agh.model.entity.WayWithSpeedInfo;
+import pl.edu.agh.model.Way;
+import pl.edu.agh.model.WayWithSpeedInfo;
 import pl.edu.agh.spatial.WGS84GeometryFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Point;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/conf/utils.xml",
@@ -46,5 +49,15 @@ public class WayDaoTest {
 	public void canReadTrafficInfo() {
 		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(19.9245182, 50.0651936), 0.1);
 		assertFalse(trafficInfo.isEmpty());
+	}
+	
+	@Test
+	public void canGetWaysInsideBox() {
+		Point point = geometryFactory.createPoint(20.235386, 49.594534);
+		Envelope envelope = point.getEnvelopeInternal();
+		envelope.expandBy(0.002);
+		
+		List<Way> ways = wayDao.getWaysInsideBox(geometryFactory.toGeometry(envelope));
+		assertFalse(ways.isEmpty());
 	}
 }

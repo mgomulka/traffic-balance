@@ -1,6 +1,6 @@
-package pl.edu.agh.model;
+package pl.edu.agh.logic;
 
-import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.model.Way;
 
 import com.vividsolutions.jts.geom.Point;
 

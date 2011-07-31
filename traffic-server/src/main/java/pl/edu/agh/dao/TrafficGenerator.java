@@ -6,7 +6,7 @@ import java.util.Random;
 import org.hibernate.Query;
 import org.springframework.stereotype.Component;
 
-import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.model.Way;
 
 @Component
 public class TrafficGenerator extends AbstractDao {

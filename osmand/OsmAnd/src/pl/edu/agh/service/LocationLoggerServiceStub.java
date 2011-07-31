@@ -1,6 +1,7 @@
 package pl.edu.agh.service;
 
-import org.apache.http.impl.client.RoutedRequest;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,11 +32,11 @@ public class LocationLoggerServiceStub extends AbstractServiceStub implements Lo
 	}
 
 	@Override
-	public RoutingResult sendLocationData(LocationData locationData) throws JSONRPCException {
+	public List<RoutingResult> sendLocationData(LocationData locationData) throws JSONRPCException {
 		try {
 			JSONObject serializedData = locationDataJSONAssembler.serialize(locationData);
 			JSONObject serializedRoutingResult = rpcClient.callJSONObject(SEND_LOCATION_DATA_METHOD, serializedData);
-			return routingResultJSONAssembler.deserialize(serializedRoutingResult);
+			return routingResultJSONAssembler.deserialize(serializedRoutingResult.getJSONArray("ala"));
 			
 		} catch (JSONException ex) {
 			throw new JSONRPCException("Error during (de)serialization", ex);

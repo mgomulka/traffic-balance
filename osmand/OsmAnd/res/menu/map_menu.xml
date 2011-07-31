@@ -19,6 +19,7 @@
 <item android:id="@+id/map_show_point_options" android:title="@string/show_point_options"></item>
 <!-- for test only -->
 <item android:id="@+id/map_menu_send_points" android:title="@string/map_menu_send_points"></item>
+<item android:id="@+id/map_menu_clear_points" android:title="@string/map_menu_clear_points"></item>
 </group>
 
 

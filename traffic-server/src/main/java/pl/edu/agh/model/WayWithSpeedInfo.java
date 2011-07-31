@@ -1,4 +1,4 @@
-package pl.edu.agh.model.entity;
+package pl.edu.agh.model;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -25,16 +25,8 @@ public class WayWithSpeedInfo extends Way {
 		return directWaySpeed;
 	}
 
-	public void setDirectWaySpeed(Double directWaySpeed) {
-		this.directWaySpeed = directWaySpeed;
-	}
-
 	public Double getReverseWaySpeed() {
 		return reverseWaySpeed;
-	}
-
-	public void setReverseWaySpeed(Double reverseWaySpeed) {
-		this.reverseWaySpeed = reverseWaySpeed;
 	}
 
 }

@@ -1,17 +1,19 @@
 package pl.edu.agh.model;
 
+import java.util.Date;
+
 public class LocationInfo extends SimpleLocationInfo {
 
-	private long time;
+	private Date time;
 	private double speed;
 	private double accuracy;
 	private double direction;
 
-	public long getTime() {
+	public Date getTime() {
 		return time;
 	}
 
-	public void setTime(long time) {
+	public void setTime(Date time) {
 		this.time = time;
 	}
 

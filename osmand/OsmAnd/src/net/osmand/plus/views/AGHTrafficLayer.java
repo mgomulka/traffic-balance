@@ -14,12 +14,12 @@ import pl.edu.agh.logic.TrafficDataProvider;
 import pl.edu.agh.logic.TrafficDataProvider.Status;
 import pl.edu.agh.model.LocationInfo;
 import pl.edu.agh.model.RectD;
+import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
 import pl.edu.agh.model.TrafficInfo;
 import pl.edu.agh.model.Vector;
 import pl.edu.agh.utils.GeometryUtils;
-import pl.edu.agh.utils.GeometryUtils.Direction;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -117,14 +117,25 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 			}
 		}
 		
-		List<SimpleLocationInfo> calc = LocationBuffer.INSTANCE.getCalculatedRoute();
-		if (calc != null) {
-			Path calcPath = createPathFromPoints(calc);
-			Paint paint = getPaintForSpeed(0.0);
-			paint.setColor(Color.MAGENTA);
-			paint.setAlpha(100);
-			paint.setStrokeWidth(25);
-			canvas.drawPath(calcPath, paint);
+		List<RoutingResult> calcs = LocationBuffer.INSTANCE.getCalculatedRoute();
+		if (calcs != null) {
+			for (RoutingResult calc : calcs) {
+				Path calcPath = createPathFromPoints(calc.getLocations());
+				Paint paint = getPaintForSpeed(0.0);
+				paint.setColor(Color.MAGENTA);
+				paint.setAlpha(100);
+				paint.setStrokeWidth(25);
+				canvas.drawPath(calcPath, paint);
+				
+				for (SimpleLocationInfo location : calc.getMatchedPoints()) {
+					int x = view.getMapXForPoint(location.getLongitude());
+					int y = view.getMapYForPoint(location.getLatitude());
+					Paint paint2 = getPaintForSpeed(0.0);
+					paint2.setColor(Color.RED);
+					paint2.setStrokeWidth(20);
+					canvas.drawPoint(x, y, paint2);
+				}
+			}
 		}
 
 	}
@@ -153,12 +164,12 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 				.getLatitude()));
 		Point canvasEnd = new Point(view.getMapXForPoint(end.getLongitude()), view.getMapYForPoint(end.getLatitude()));
 
-		Vector directWay = GeometryUtils.translate(new Vector(canvasBegin, canvasEnd), strokeWidth / 2.0,
-				Direction.RIGHT);
+		Vector directWay = new Vector(canvasBegin, canvasEnd).translatePerpendicularly(strokeWidth / 2.0,
+				Vector.Direction.RIGHT);
 		drawSectionWithSpeed(directWay, trafficInfo.getDirectWaySpeed(), canvas);
 
-		Vector reverseWay = GeometryUtils.translate(new Vector(canvasBegin, canvasEnd), strokeWidth / 2.0,
-				Direction.LEFT);
+		Vector reverseWay = new Vector(canvasBegin, canvasEnd).translatePerpendicularly(strokeWidth / 2.0,
+				Vector.Direction.LEFT);
 		drawSectionWithSpeed(reverseWay, trafficInfo.getReverseWaySpeed(), canvas);
 	}
 

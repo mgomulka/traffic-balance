@@ -2,11 +2,11 @@ package pl.edu.agh.bo;
 
 import org.springframework.stereotype.Component;
 
-import pl.edu.agh.model.WayWithBothEndPoints;
-import pl.edu.agh.model.WayWithEndPoint;
-import pl.edu.agh.model.WayWithOneEndPoint;
-import pl.edu.agh.model.WayWithStartPoint;
-import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.logic.WayWithBothEndPoints;
+import pl.edu.agh.logic.WayWithEndPoint;
+import pl.edu.agh.logic.WayWithOneEndPoint;
+import pl.edu.agh.logic.WayWithStartPoint;
+import pl.edu.agh.model.Way;
 
 import com.vividsolutions.jts.geom.Point;
 

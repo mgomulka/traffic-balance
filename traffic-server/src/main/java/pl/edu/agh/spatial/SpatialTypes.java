@@ -1,4 +1,4 @@
-package pl.edu.agh.dao;
+package pl.edu.agh.spatial;
 
 import org.hibernate.type.CustomType;
 import org.hibernate.type.Type;

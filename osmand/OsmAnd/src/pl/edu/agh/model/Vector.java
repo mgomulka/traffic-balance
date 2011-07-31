@@ -3,6 +3,10 @@ package pl.edu.agh.model;
 import android.graphics.Point;
 
 public class Vector {
+	
+	public static enum Direction {
+		LEFT, RIGHT;
+	}
 
 	private Point begin;
 	private Point end;
@@ -34,6 +38,30 @@ public class Vector {
 
 	public Vector translate(Vector other) {
 		return translate(other.getX(), other.getY());
+	}
+	
+	public Vector translatePerpendicularly(double distance, Direction direction) {
+		Vector translatingVector;
+		
+		if (getX() == 0) {
+			translatingVector = new Vector((int)Math.round(distance), 0);
+		} else if (getY() == 0) {
+			translatingVector = new Vector(0, (int)Math.round(distance));
+		} else {
+			double dy = distance / Math.sqrt((getY() * getY()) / (getX() * getX()) + 1);
+			double dx = -(getY() / getX()) * dy;
+			translatingVector = new Vector((int) Math.round(dx), (int) Math.round(dy));
+		}
+		
+		if ((determinant(this, translatingVector) < 0) == (direction == Direction.RIGHT)) {
+			return translate(translatingVector);
+		} else {
+			return translate(translatingVector.reverse());
+		}
+	}
+	
+	private int determinant(Vector v1, Vector v2) {
+		return v1.getX() * v2.getY() - v1.getY() * v2.getX();
 	}
 
 	public Vector reverse() {

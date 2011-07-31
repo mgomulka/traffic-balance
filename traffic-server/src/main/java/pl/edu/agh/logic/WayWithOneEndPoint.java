@@ -1,11 +1,11 @@
-package pl.edu.agh.model;
+package pl.edu.agh.logic;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static pl.edu.agh.spatial.HaversineDistanceCalculator.EARTH_DISTANCE_CALCULATOR;
 
 import java.util.List;
 
-import pl.edu.agh.model.entity.Way;
+import pl.edu.agh.model.Way;
 import pl.edu.agh.spatial.LineSegmentList;
 
 import com.google.common.collect.Lists;
@@ -26,9 +26,9 @@ public abstract class WayWithOneEndPoint extends WayWithEndPoints {
 		return EARTH_DISTANCE_CALCULATOR.distance(way.getStartPoint(), point) < EARTH_DISTANCE_CALCULATOR.distance(
 				way.getEndPoint(), point) ? way.getSource() : way.getTarget();
 	}
-	
+
 	public abstract Integer getWayEndPoint();
-	
+
 	public Integer getWayEndPointOppositeTo(Integer endPoint) {
 		if (endPoint.equals(way.getSource())) {
 			return way.getTarget();
@@ -53,18 +53,16 @@ public abstract class WayWithOneEndPoint extends WayWithEndPoints {
 	}
 
 	private List<Point> createWayFromTarget() {
-		LineSegmentList lines = new LineSegmentList((LineString) way.getLineString().reverse());
-		LineSegment nearestLine = findNearestLine(point, lines);
-		return createWayFromPoint(lines, nearestLine);
+		return createWayFromPoint(new LineSegmentList((LineString) way.getLineString().reverse()));
 	}
 
 	private List<Point> createWayFromSource() {
-		LineSegmentList lines = new LineSegmentList(way.getLineString());
-		LineSegment nearestLine = findNearestLine(point, lines);
-		return createWayFromPoint(lines, nearestLine);
+		return createWayFromPoint(new LineSegmentList(way.getLineString()));
 	}
 
-	private List<Point> createWayFromPoint(LineSegmentList lines, LineSegment nearestLine) {
+	private List<Point> createWayFromPoint(LineSegmentList lines) {
+		LineSegment nearestLine = lines.nearestLine(point);
+
 		List<Point> route = newArrayList();
 		for (LineSegment line : lines) {
 			route.add(geometryFactory.createPoint(line.p0));

@@ -2,6 +2,8 @@ package pl.edu.agh.skeleton;
 
 import static pl.edu.agh.service.LocationLoggerService.SEND_LOCATION_DATA_METHOD;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,10 +45,14 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 
 	private JSONObject invokeSendLocationData(JSONArray params) throws JSONRPCException, JSONException {
 		LocationData locationData = locationDataJSONAssembler.deserialize(params.getJSONObject(0));
+		System.out.println(params.getJSONObject(0).toString());
 
-		RoutingResult rr = locationLoggerService.sendLocationData(locationData);
+		List<RoutingResult> rr = locationLoggerService.sendLocationData(locationData);
 
-		return routingResultJSONAssembler.serialize(rr);
+		JSONObject result = new JSONObject();
+		result.put("ala", routingResultJSONAssembler.serialize(rr));
+		
+		return result;
 	}
 
 }

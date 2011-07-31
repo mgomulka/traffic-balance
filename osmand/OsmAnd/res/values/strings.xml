@@ -19,6 +19,7 @@
 	<string name="context_menu_item_add_waypoint">Add Gpx waypoint</string>
 	<string name="context_menu_item_select_for_agh">Select for AGH</string>
 	<string name="map_menu_send_points">Send points to server</string>
+	<string name="map_menu_clear_points">Clear points for AGH</string>
 	<string name="amenity_type_administrative">Administrative</string>
 	<string name="amenity_type_barrier">Barrier</string>
 	<string name="amenity_type_education">Education</string>

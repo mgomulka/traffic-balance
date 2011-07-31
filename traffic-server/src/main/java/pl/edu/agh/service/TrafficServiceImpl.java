@@ -13,7 +13,7 @@ import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
 import pl.edu.agh.model.TrafficInfo;
-import pl.edu.agh.model.entity.WayWithSpeedInfo;
+import pl.edu.agh.model.WayWithSpeedInfo;
 import pl.edu.agh.spatial.GeometryHelper;
 import pl.edu.agh.spatial.WGS84GeometryFactory;
 

@@ -1,4 +1,4 @@
-package pl.edu.agh.model.entity;
+package pl.edu.agh.model;
 
 import java.io.Serializable;
 
@@ -172,6 +172,62 @@ public class Way implements Serializable {
 		
 		Way other = (Way) o;
 		return Objects.equal(this.gid, other.gid);
+	}
+
+	public void setGid(Integer gid) {
+		this.gid = gid;
+	}
+
+	public void setClassId(Integer classId) {
+		this.classId = classId;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setStartX(double startX) {
+		this.startX = startX;
+	}
+
+	public void setStartY(double startY) {
+		this.startY = startY;
+	}
+
+	public void setEndX(double endX) {
+		this.endX = endX;
+	}
+
+	public void setEndY(double endY) {
+		this.endY = endY;
+	}
+
+	public void setReverseCost(double reverseCost) {
+		this.reverseCost = reverseCost;
+	}
+
+	public void setSource(Integer source) {
+		this.source = source;
+	}
+
+	public void setTarget(Integer target) {
+		this.target = target;
+	}
+
+	public void setRule(String rule) {
+		this.rule = rule;
+	}
+
+	public void setToCost(Double toCost) {
+		this.toCost = toCost;
+	}
+
+	public void setGeometry(Geometry geometry) {
+		this.geometry = geometry;
 	}
 	
 	

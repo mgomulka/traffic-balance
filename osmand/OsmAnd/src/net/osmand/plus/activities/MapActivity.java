@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1031,6 +1032,10 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 			// for test only
 			LocationBuffer.INSTANCE.sendLocations();
 			return true;
+		} else if (item.getItemId() == R.id.map_menu_clear_points) {
+			// for test only
+			LocationBuffer.INSTANCE.getAndClearLocations();
+			return true;
 		} else if (item.getItemId() == R.id.map_where_am_i) {
 			backToLocationImpl();
         	return true;
@@ -1687,7 +1692,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 					loc.setLatitude(latitude);
 					loc.setLongitude(longitude);
 					loc.setSpeed(0.0);
-					loc.setTime(0);
+					loc.setTime(new Date());
 					LocationBuffer.INSTANCE.addLocation(loc);
 				} else if(standardId == R.string.context_menu_item_search_poi){
 					Intent intent = new Intent(MapActivity.this, SearchPoiFilterActivity.class);
