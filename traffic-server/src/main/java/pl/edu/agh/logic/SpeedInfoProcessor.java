@@ -36,9 +36,11 @@ public class SpeedInfoProcessor {
 					nextRoadFirstMatching, nextRoadBegin);
 			double timeDifference = timeDifference(currentRoadBegin.getIntersectionTime(),
 					nextRoadBegin.getIntersectionTime()).toSeconds();
-
-			infos.add(createSpeedInfo(nextRoadBegin.getPreviousRoadMatching().getRoad(), distance / timeDifference,
-					nextRoadBegin.getIntersectionTime()));
+			
+			if (distance != 0 && timeDifference != 0) {
+				infos.add(createSpeedInfo(nextRoadBegin.getPreviousRoadMatching().getRoad(), distance / timeDifference,
+						nextRoadBegin.getIntersectionTime()));
+			}
 
 			currentRoadMatching = nextRoadFirstMatching;
 			currentRoadBegin = nextRoadBegin;

@@ -2,6 +2,7 @@ package pl.edu.agh.dao;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -47,8 +48,8 @@ public class WayDaoTest {
 	
 	@Test
 	public void canReadTrafficInfo() {
-		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(19.9245182, 50.0651936), 0.1);
-		assertFalse(trafficInfo.isEmpty());
+		List<WayWithSpeedInfo> trafficInfo = wayDao.getTrafficData(geometryFactory.createPoint(0, 0), 0.1);
+		assertTrue(trafficInfo.isEmpty());
 	}
 	
 	@Test

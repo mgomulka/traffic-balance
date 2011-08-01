@@ -5,8 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Date;
 import java.util.List;
 
-import pl.edu.agh.model.RoutingResult;
-import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.utils.Collections;
 
 import com.google.common.base.Function;
@@ -131,31 +129,6 @@ public class Path {
 
 	public int getTarget() {
 		return getLastRoad().getTarget();
-	}
-
-	public RoutingResult toRoutingResult() {
-		List<Coordinate> coords = newArrayList();
-		for (PointMatching match : matchings) {
-			coords.add(match.getRoad().nearestPoint(match.getPoint()));
-		}
-		
-		coords = Collections.removeAdjacentDuplicates(coords);
-		RoutingResult routingResult = new RoutingResult(Lists.transform(coords,
-				new Function<Coordinate, SimpleLocationInfo>() {
-					@Override
-					public SimpleLocationInfo apply(Coordinate input) {
-						return new SimpleLocationInfo(input.x, input.y);
-					}
-				}));
-
-		List<SimpleLocationInfo> matchedPoints = newArrayList();
-		for (PointMatching matching : matchings) {
-			Coordinate np = matching.getRoad().nearestPoint(matching.getPoint());
-			matchedPoints.add(new SimpleLocationInfo(np.x, np.y));
-		}
-
-		routingResult.setMatchedPoints(matchedPoints);
-		return routingResult;
 	}
 
 	public List<PointMatching> getMatchings() {

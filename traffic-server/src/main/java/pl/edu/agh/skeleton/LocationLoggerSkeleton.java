@@ -2,8 +2,6 @@ package pl.edu.agh.skeleton;
 
 import static pl.edu.agh.service.LocationLoggerService.SEND_LOCATION_DATA_METHOD;
 
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import pl.edu.agh.assembler.LocationDataJSONAssembler;
-import pl.edu.agh.assembler.RoutingResultJSONAssembler;
 import pl.edu.agh.jsonrpc.JSONRPCException;
 import pl.edu.agh.jsonrpc.JSONRPCSkeleton;
 import pl.edu.agh.model.LocationData;
-import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.service.LocationLoggerService;
 
 @Component(LocationLoggerSkeleton.BEAN_NAME)
@@ -28,9 +24,6 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 
 	@Autowired
 	private LocationDataJSONAssembler locationDataJSONAssembler;
-	
-	@Autowired
-	private RoutingResultJSONAssembler routingResultJSONAssembler;
 
 	@Override
 	protected JSONObject invoke(String methodName, JSONArray params) throws JSONException, JSONRPCException,
@@ -47,12 +40,9 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 		LocationData locationData = locationDataJSONAssembler.deserialize(params.getJSONObject(0));
 		System.out.println(params.getJSONObject(0).toString());
 
-		List<RoutingResult> rr = locationLoggerService.sendLocationData(locationData);
+		locationLoggerService.sendLocationData(locationData);
 
-		JSONObject result = new JSONObject();
-		result.put("ala", routingResultJSONAssembler.serialize(rr));
-		
-		return result;
+		return NULL_RESULT;
 	}
 
 }

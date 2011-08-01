@@ -14,7 +14,6 @@ import pl.edu.agh.logic.TrafficDataProvider;
 import pl.edu.agh.logic.TrafficDataProvider.Status;
 import pl.edu.agh.model.LocationInfo;
 import pl.edu.agh.model.RectD;
-import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
 import pl.edu.agh.model.TrafficInfo;
@@ -51,10 +50,10 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 
 	private static final SortedMap<Double, Integer> SPEED_MAPPING = new TreeMap<Double, Integer>() {
 		{
-			put(15.0, 0x970000);
-			put(30.0, Color.RED);
-			put(45.0, 0xFF7F27);
-			put(60.0, 0xFFEF00);
+			put(4.0, 0x970000);
+			put(8.25, Color.RED);
+			put(12.5, 0xFF7F27);
+			put(16.75, 0xFFEF00);
 			put(Double.MAX_VALUE, 0x00DA00);
 		}
 	};
@@ -103,7 +102,7 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 				drawTrafficInfo(trafficInfo, canvas);
 			}
 		}
-		
+
 		// for test only
 		List<LocationInfo> locations = LocationBuffer.INSTANCE.getLocations();
 		if (locations != null) {
@@ -114,27 +113,6 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 				paint.setColor(Color.BLUE);
 				paint.setStrokeWidth(30);
 				canvas.drawPoint(x, y, paint);
-			}
-		}
-		
-		List<RoutingResult> calcs = LocationBuffer.INSTANCE.getCalculatedRoute();
-		if (calcs != null) {
-			for (RoutingResult calc : calcs) {
-				Path calcPath = createPathFromPoints(calc.getLocations());
-				Paint paint = getPaintForSpeed(0.0);
-				paint.setColor(Color.MAGENTA);
-				paint.setAlpha(100);
-				paint.setStrokeWidth(25);
-				canvas.drawPath(calcPath, paint);
-				
-				for (SimpleLocationInfo location : calc.getMatchedPoints()) {
-					int x = view.getMapXForPoint(location.getLongitude());
-					int y = view.getMapYForPoint(location.getLatitude());
-					Paint paint2 = getPaintForSpeed(0.0);
-					paint2.setColor(Color.RED);
-					paint2.setStrokeWidth(20);
-					canvas.drawPoint(x, y, paint2);
-				}
 			}
 		}
 
@@ -160,17 +138,21 @@ public class AGHTrafficLayer implements OsmandMapLayer, TrafficDataListener {
 	private void drawSection(SimpleLocationInfo begin, SimpleLocationInfo end, TrafficInfo trafficInfo, Canvas canvas) {
 		int strokeWidth = calculateStrokeWidth();
 
-		Point canvasBegin = new Point(view.getMapXForPoint(begin.getLongitude()), view.getMapYForPoint(begin
+		Point sectionBegin = new Point(view.getMapXForPoint(begin.getLongitude()), view.getMapYForPoint(begin
 				.getLatitude()));
-		Point canvasEnd = new Point(view.getMapXForPoint(end.getLongitude()), view.getMapYForPoint(end.getLatitude()));
+		Point sectionEnd = new Point(view.getMapXForPoint(end.getLongitude()), view.getMapYForPoint(end.getLatitude()));
 
-		Vector directWay = new Vector(canvasBegin, canvasEnd).translatePerpendicularly(strokeWidth / 2.0,
-				Vector.Direction.RIGHT);
-		drawSectionWithSpeed(directWay, trafficInfo.getDirectWaySpeed(), canvas);
+		if (trafficInfo.getDirectWaySpeed() != null) {
+			Vector directWay = new Vector(sectionBegin, sectionEnd).translatePerpendicularly(strokeWidth / 2.0,
+					Vector.Direction.RIGHT);
+			drawSectionWithSpeed(directWay, trafficInfo.getDirectWaySpeed(), canvas);
+		}
 
-		Vector reverseWay = new Vector(canvasBegin, canvasEnd).translatePerpendicularly(strokeWidth / 2.0,
-				Vector.Direction.LEFT);
-		drawSectionWithSpeed(reverseWay, trafficInfo.getReverseWaySpeed(), canvas);
+		if (trafficInfo.getReverseWaySpeed() != null) {
+			Vector reverseWay = new Vector(sectionBegin, sectionEnd).translatePerpendicularly(strokeWidth / 2.0,
+					Vector.Direction.LEFT);
+			drawSectionWithSpeed(reverseWay, trafficInfo.getReverseWaySpeed(), canvas);
+		}
 	}
 
 	private void drawSectionWithSpeed(Vector section, double speed, Canvas canvas) {

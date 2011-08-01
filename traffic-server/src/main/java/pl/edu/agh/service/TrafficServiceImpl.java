@@ -76,7 +76,7 @@ public class TrafficServiceImpl implements TrafficService {
 			public TrafficInfo apply(WayWithSpeedInfo way) {
 				List<SimpleLocationInfo> points = transformPointsToInfos(GeometryHelper.getPointsFromGeometry(
 						way.getLineString(), geometryFactory));
-				return new TrafficInfo(points, way.getDirectWaySpeed(), way.getReverseWaySpeed());
+				return new TrafficInfo(points, way.getDirectWaySpeed(), way.getReverseWaySpeed(), way.isOneWay());
 			}
 		});
 		return trafficInfos;

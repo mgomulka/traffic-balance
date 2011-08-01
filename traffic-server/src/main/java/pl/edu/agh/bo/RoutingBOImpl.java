@@ -30,7 +30,6 @@ import pl.edu.agh.logic.WayWithBothEndPoints;
 import pl.edu.agh.logic.WayWithOneEndPoint;
 import pl.edu.agh.model.LocationData;
 import pl.edu.agh.model.LocationInfo;
-import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SpeedInfo;
 import pl.edu.agh.model.Way;
 import pl.edu.agh.model.WayWithSpeedInfo;
@@ -162,29 +161,17 @@ public class RoutingBOImpl implements RoutingBO {
 
 	@Transactional
 	@Override
-	public List<RoutingResult> processLocationData(LocationData locationData) {
-		List<Path> result = newArrayList();
-
+	public void processLocationData(LocationData locationData) {
 		List<Point> points = retrievePointsFromLocationData(locationData);
 
 		RoadNetwork roadNetwork = createRoadNetworkForPoints(points);
 		ListIterator<Point> currentPointIterator = points.listIterator();
 
 		while (currentPointIterator.hasNext()) {
-			List<Path> splitted = withoutUTurnsAndLowQualityMatchings.split(calculateBestPath(
-					currentPointIterator, points, roadNetwork));
+			List<Path> splitted = withoutUTurnsAndLowQualityMatchings.split(calculateBestPath(currentPointIterator,
+					points, roadNetwork));
 			retrieveAndSaveSpeedInfoFromPath(splitted);
-
-			result.addAll(splitted);
 		}
-
-		return Lists.transform(result, new Function<Path, RoutingResult>() {
-			@Override
-			public RoutingResult apply(Path input) {
-				return input.toRoutingResult();
-			}
-		});
-
 	}
 
 	private void retrieveAndSaveSpeedInfoFromPath(List<Path> paths) {
@@ -251,7 +238,7 @@ public class RoutingBOImpl implements RoutingBO {
 		Date previousPointTime = (Date) previousPoint.getUserData();
 		Date currentPointTime = (Date) currentPoint.getUserData();
 
-		return timeDifference(previousPointTime, currentPointTime).toSeconds() > MAX_POINT_INTERVAL; 
+		return timeDifference(previousPointTime, currentPointTime).toSeconds() > MAX_POINT_INTERVAL;
 	}
 
 	private List<Path> createInitialPaths(Iterator<Point> pointIterator, RoadNetwork roadNetwork) {

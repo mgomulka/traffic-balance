@@ -7,6 +7,7 @@ public class TrafficInfo {
 	private List<SimpleLocationInfo> way;
 	private Double directWaySpeed;
 	private Double reverseWaySpeed;
+	private boolean oneWay;
 
 	public List<SimpleLocationInfo> getWay() {
 		return way;
@@ -20,14 +21,15 @@ public class TrafficInfo {
 		return reverseWaySpeed;
 	}
 
-	public TrafficInfo(List<SimpleLocationInfo> way, Double directWaySpeed, Double reverseWaySpeed) {
+	public boolean isOneWay() {
+		return oneWay;
+	}
+	
+	public TrafficInfo(List<SimpleLocationInfo> way, Double directWaySpeed, Double reverseWaySpeed, boolean oneWay) {
 		this.way = way;
 		this.directWaySpeed = directWaySpeed;
 		this.reverseWaySpeed = reverseWaySpeed;
-	}
-
-	public boolean isOneWay() {
-		return reverseWaySpeed == null;
+		this.oneWay = oneWay;
 	}
 
 }

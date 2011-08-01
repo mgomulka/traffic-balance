@@ -7,9 +7,16 @@ public class Vector {
 	public static enum Direction {
 		LEFT, RIGHT;
 	}
+	
+	private static enum Rotation {
+		LEVOROTATORY, DEXTROROTATORY;
+	}
+	
+	private static final Rotation COORDINATE_SYSTEM_ROTATION = Rotation.DEXTROROTATORY;
 
 	private Point begin;
 	private Point end;
+	
 
 	public Vector(Point begin, Point end) {
 		this.begin = new Point(begin);
@@ -53,7 +60,7 @@ public class Vector {
 			translatingVector = new Vector((int) Math.round(dx), (int) Math.round(dy));
 		}
 		
-		if ((determinant(this, translatingVector) < 0) == (direction == Direction.RIGHT)) {
+		if ((determinant(this, translatingVector) > 0) == ((direction == Direction.LEFT) == (COORDINATE_SYSTEM_ROTATION == Rotation.LEVOROTATORY))) {
 			return translate(translatingVector);
 		} else {
 			return translate(translatingVector.reverse());

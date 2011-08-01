@@ -9,6 +9,12 @@ public class Vector {
 	public static enum Direction {
 		LEFT, RIGHT;
 	}
+	
+	private static enum Rotation {
+		LEVOROTATORY, DEXTROROTATORY;
+	}
+	
+	private static final Rotation COORDINATE_SYSTEM_ROTATION = Rotation.LEVOROTATORY;
 
 	private GeometryFactory geometryFactory;
 	private Point begin;
@@ -64,7 +70,7 @@ public class Vector {
 			translatingVector = new Vector(dx, dy, geometryFactory);
 		}
 		
-		if ((determinant(this, translatingVector) < 0) == (direction == Direction.RIGHT)) {
+		if ((determinant(this, translatingVector) > 0) == ((direction == Direction.LEFT) == (COORDINATE_SYSTEM_ROTATION == Rotation.LEVOROTATORY))) {
 			return translate(translatingVector);
 		} else {
 			return translate(translatingVector.reverse());
