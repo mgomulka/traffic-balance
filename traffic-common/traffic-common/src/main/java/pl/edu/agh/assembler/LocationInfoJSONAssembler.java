@@ -11,12 +11,9 @@ import pl.edu.agh.model.LocationInfo;
 
 public class LocationInfoJSONAssembler extends AbstractJSONAssembler<LocationInfo> {
 
-	private static final String DIRECTION_PARAM = "dir";
-	private static final String ACCURACY_PARAM = "acc";
-	private static final String SPEED_PARAM = "spd";
 	private static final String TIME_PARAM = "time";
 	
-	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	private SimpleLocationInfoJSONAssembler simpleAssembler;
 
@@ -30,9 +27,6 @@ public class LocationInfoJSONAssembler extends AbstractJSONAssembler<LocationInf
 		JSONObject serializedInfo = simpleAssembler.serialize(info);
 
 		serializedInfo.put(TIME_PARAM, formatter.format(info.getTime()));
-		serializedInfo.put(SPEED_PARAM, info.getSpeed());
-		serializedInfo.put(ACCURACY_PARAM, info.getAccuracy());
-		serializedInfo.put(DIRECTION_PARAM, info.getDirection());
 
 		return serializedInfo;
 	}
@@ -48,9 +42,6 @@ public class LocationInfoJSONAssembler extends AbstractJSONAssembler<LocationInf
 			info.setTime(formatter.parse(serializedInfo.getString(TIME_PARAM)));
 		} catch (ParseException e) {
 		}
-		info.setSpeed(serializedInfo.getDouble(SPEED_PARAM));
-		info.setAccuracy(serializedInfo.getDouble(ACCURACY_PARAM));
-		info.setDirection(serializedInfo.getDouble(DIRECTION_PARAM));
 
 		return info;
 	}

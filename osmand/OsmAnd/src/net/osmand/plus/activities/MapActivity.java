@@ -63,6 +63,7 @@ import net.osmand.plus.views.TransportStopsLayer;
 import net.osmand.plus.views.YandexTrafficLayer;
 import pl.edu.agh.logic.LocationBuffer;
 import pl.edu.agh.model.LocationInfo;
+import pl.edu.agh.service.LocationLogger;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -178,8 +179,22 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 	private Dialog progressDlg = null;
 	private SharedPreferences settings;
 	
-	
+/*	private boolean boundToLoggingService = false;
+	private LocationLogger locationLogger;
+	private ServiceConnection locationLoggerConnection = new ServiceConnection() {
+		
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			boundToLoggingService = true;			
+			locationLogger = ((ServiceAccess)service).getService();
+		}
 
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			boundToLoggingService = false;
+		}
+	};
+*/
 	private boolean isMapLinkedToLocation(){
 		return OsmandSettings.isMapSyncToGpsLocation(settings);
 	}
@@ -302,6 +317,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		// it tries to continue the last route
 		if(!Algoritms.objectEquals(routingHelper.getFinalLocation(), pointToNavigate)){
 			routingHelper.setFollowingMode(false);
+			stopLogger();
 			routingHelper.setFinalAndCurrentLocation(pointToNavigate, null);
 
 		}
@@ -315,6 +331,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						routingHelper.setFollowingMode(true);
+						startLogger();
 						((OsmandApplication)getApplication()).showDialogInitializingCommandPlayer(MapActivity.this);
 					}
 				});
@@ -441,10 +458,14 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     	return super.onTrackballEvent(event);
     }
     
-    @Override
-    protected void onStart() {
-    	super.onStart();
-    }
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		/*if (!boundToLoggingService) {
+			this.bindService(new Intent(this, LocationLogger.class), locationLoggerConnection, Context.BIND_AUTO_CREATE);
+		}*/
+	}
     
     @Override
     protected void onStop() {
@@ -457,6 +478,9 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 			progressDlg.dismiss();
 			progressDlg = null;
 		}
+		/*if(boundToLoggingService) {
+    		this.unbindService(locationLoggerConnection);
+    	}*/
     	super.onStop();
     }
     
@@ -592,6 +616,8 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		routingHelper.setFinalAndCurrentLocation(point, null, routingHelper.getCurrentGPXRoute());
 		if(point == null){
 			routingHelper.setFollowingMode(false);
+			stopLogger();
+			
 			OsmandSettings.setFollowingByRoute(MapActivity.this, false);
 		}
 		navigationLayer.setPointToNavigate(point);
@@ -1083,6 +1109,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     			if(routingHelper.isRouteCalculated()){
     				routingHelper.setFinalAndCurrentLocation(null, null);
     				OsmandSettings.setFollowingByRoute(MapActivity.this, false);
+    				stopLogger();
     				routingHelper.setFollowingMode(false);
     			} else {
     				navigateToPoint(null);
@@ -1171,6 +1198,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				routingHelper.setAppMode(mode);
 				OsmandSettings.setFollowingByRoute(MapActivity.this, false);
 				routingHelper.setFollowingMode(false);
+				stopLogger();
 				routingHelper.setFinalAndCurrentLocation(navigationLayer.getPointToNavigate(), map);
 			}
     	};
@@ -1199,6 +1227,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				routingHelper.setAppMode(mode);
 				OsmandSettings.setFollowingByRoute(MapActivity.this, true);
 				routingHelper.setFollowingMode(true);
+				startLogger();
 				routingHelper.setFinalAndCurrentLocation(navigationLayer.getPointToNavigate(), location);
 				
 				((OsmandApplication) getApplication()).showDialogInitializingCommandPlayer(MapActivity.this);
@@ -1555,6 +1584,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				if(endForRouting != null){
 					OsmandSettings.setFollowingByRoute(MapActivity.this, true);
 					routingHelper.setFollowingMode(true);
+					startLogger();					
 					routingHelper.setFinalAndCurrentLocation(endPoint, startForRouting, l);
 					((OsmandApplication)getApplication()).showDialogInitializingCommandPlayer(MapActivity.this);
 				}
@@ -1687,11 +1717,8 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				} else if (standardId == R.string.context_menu_item_select_for_agh) {
 					// for test only
 					LocationInfo loc = new LocationInfo();
-					loc.setAccuracy(0.0);
-					loc.setDirection(0.0);
 					loc.setLatitude(latitude);
 					loc.setLongitude(longitude);
-					loc.setSpeed(0.0);
 					loc.setTime(new Date());
 					LocationBuffer.INSTANCE.addLocation(loc);
 				} else if(standardId == R.string.context_menu_item_search_poi){
@@ -1872,6 +1899,14 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		if(locationLayer.getLastKnownLocation() == null){
 			Toast.makeText(this, R.string.unknown_location, Toast.LENGTH_LONG).show();
 		}
+	}
+	
+	public void startLogger() {
+		startService(new Intent(MapActivity.this, LocationLogger.class));
+	}
+	
+	public void stopLogger() {
+		stopService(new Intent(MapActivity.this, LocationLogger.class));
 	}
 
 }
