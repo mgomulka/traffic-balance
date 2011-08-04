@@ -140,6 +140,7 @@ public class RoutingHelper {
 			if(lastFixedLocation != null && lastFixedLocation.distanceTo(lastPoint) < 60){
 				showMessage(context.getString(R.string.arrived_at_destination));
 				OsmandSettings.setFollowingByRoute(context, false);
+				setFollowingMode(false);
 				voiceRouter.arrivedDestinationPoint();
 				updateCurrentRoute(routeNodes.size() - 1);
 				// clear final location to prevent all time showing message

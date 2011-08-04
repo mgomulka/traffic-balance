@@ -20,12 +20,15 @@ import pl.edu.agh.dao.WayDao;
 import pl.edu.agh.exception.BusinessException;
 import pl.edu.agh.logic.Path;
 import pl.edu.agh.logic.PathComparatorByCost;
+import pl.edu.agh.logic.PathCorrector;
 import pl.edu.agh.logic.PathSplitter;
+import pl.edu.agh.logic.PathUtils;
 import pl.edu.agh.logic.PathWithoutLowQualityMatchingsSplitter;
 import pl.edu.agh.logic.PathWithoutUTurnsSplitter;
 import pl.edu.agh.logic.Road;
 import pl.edu.agh.logic.RoadNetwork;
 import pl.edu.agh.logic.SpeedInfoProcessor;
+import pl.edu.agh.logic.UTurnPathCorrector;
 import pl.edu.agh.logic.WayWithBothEndPoints;
 import pl.edu.agh.logic.WayWithOneEndPoint;
 import pl.edu.agh.model.LocationData;
@@ -58,6 +61,7 @@ public class RoutingBOImpl implements RoutingBO {
 
 	private final PathSplitter withoutUTurnsAndLowQualityMatchings = new PathWithoutLowQualityMatchingsSplitter(
 			new PathWithoutUTurnsSplitter(), GPS_METER_ACCURACY);
+
 	private final SpeedInfoProcessor speedInfoProcessor = new SpeedInfoProcessor();
 
 	@Autowired
@@ -165,16 +169,21 @@ public class RoutingBOImpl implements RoutingBO {
 		List<Point> points = retrievePointsFromLocationData(locationData);
 
 		RoadNetwork roadNetwork = createRoadNetworkForPoints(points);
+		PathCorrector pathCorrector = new UTurnPathCorrector(roadNetwork);
 		ListIterator<Point> currentPointIterator = points.listIterator();
 
 		while (currentPointIterator.hasNext()) {
-			List<Path> splitted = withoutUTurnsAndLowQualityMatchings.split(calculateBestPath(currentPointIterator,
-					points, roadNetwork));
-			retrieveAndSaveSpeedInfoFromPath(splitted);
+			Path bestPath = calculateBestPath(currentPointIterator, points, roadNetwork);
+			if (bestPath == null) {
+				continue;
+			}
+
+			List<Path> splittedBestPath = withoutUTurnsAndLowQualityMatchings.split(pathCorrector.correct(bestPath));
+			retrieveAndSaveSpeedInfoFromPaths(splittedBestPath);
 		}
 	}
 
-	private void retrieveAndSaveSpeedInfoFromPath(List<Path> paths) {
+	private void retrieveAndSaveSpeedInfoFromPaths(List<Path> paths) {
 		for (Path path : paths) {
 			List<SpeedInfo> infos = speedInfoProcessor.retrieveSpeedInfoFromPath(path);
 			for (SpeedInfo speedInfo : infos) {
@@ -206,7 +215,7 @@ public class RoutingBOImpl implements RoutingBO {
 		for (Path currentPath : currentPaths) {
 			nextStepBestPaths.add(currentPath.copy().matchPointToLastRoad(point.getCoordinate(), pointTime));
 
-			if (pathContainsOneRoad(currentPath)
+			if (PathUtils.pathContainsOneDirectedRoad(currentPath)
 					|| currentPath.hasPointReachedEndOfLastRoad(point.getCoordinate(), REACHING_END_OF_ROAD_FACTOR)) {
 				Collection<Road> forwardStar = roadNetwork.getRoadsBySource(currentPath.getTarget());
 				for (Road nextRoad : forwardStar) {
@@ -216,10 +225,6 @@ public class RoutingBOImpl implements RoutingBO {
 			}
 		}
 		return nextStepBestPaths;
-	}
-
-	private boolean pathContainsOneRoad(Path path) {
-		return path.getUniqueSegmentsNumber() == 1;
 	}
 
 	private List<Path> filterPathsWithLowCost(List<Path> paths) {
@@ -250,14 +255,14 @@ public class RoutingBOImpl implements RoutingBO {
 			}
 		}
 
-		return null;
+		return newArrayList();
 	}
 
 	private RoadNetwork createRoadNetworkForPoints(List<Point> points) {
 		Geometry boundingBox = getBoundingBoxForPoints(points);
 		List<Way> ways = wayDao.getWaysInsideBox(boundingBox);
 
-		RoadNetwork roadNetwork = new RoadNetwork(ways, geometryFactory, GPS_DEGREE_ACCURACY);
+		RoadNetwork roadNetwork = new RoadNetwork(ways, geometryFactory);
 		return roadNetwork;
 	}
 

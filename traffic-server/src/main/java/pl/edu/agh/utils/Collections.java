@@ -103,4 +103,21 @@ public class Collections {
 
 		return iterator;
 	}
+	
+	public static <T> ListIterator<T> moveIteratorToPreviousElementMatchingPredicate(ListIterator<T> iterator,
+			Predicate<T> predicate) {
+		boolean foundElementsMatchingPredicate = false;
+
+		while (iterator.hasPrevious() && !foundElementsMatchingPredicate) {
+			if (predicate.apply(iterator.previous())) {
+				foundElementsMatchingPredicate = true;
+			}
+		}
+
+		if (foundElementsMatchingPredicate) {
+			iterator.next();
+		}
+
+		return iterator;
+	}
 }

@@ -1,5 +1,7 @@
 package pl.edu.agh.spatial;
 
+import static pl.edu.agh.spatial.HaversineDistanceCalculator.EARTH_DISTANCE_CALCULATOR;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -45,7 +47,7 @@ public class LineSegmentList implements Iterable<LineSegment> {
 		length = 0.0;
 		
 		for (LineSegment segment : lines) {
-			length += segment.getLength();
+			length += EARTH_DISTANCE_CALCULATOR.distance(segment.p0, segment.p1); 
 		}
 	}
 

@@ -38,7 +38,7 @@ public class SpeedInfoProcessor {
 					nextRoadBegin.getIntersectionTime()).toSeconds();
 			
 			if (distance != 0 && timeDifference != 0) {
-				infos.add(createSpeedInfo(nextRoadBegin.getPreviousRoadMatching().getRoad(), distance / timeDifference,
+				infos.add(createSpeedInfo(nextRoadBegin.getPreviousRoadMatching().getRoad(), timeDifference, distance,
 						nextRoadBegin.getIntersectionTime()));
 			}
 
@@ -79,15 +79,18 @@ public class SpeedInfoProcessor {
 		return distance;
 	}
 
-	private SpeedInfo createSpeedInfo(Road road, double speed, Date intersectionTime) {
+	private SpeedInfo createSpeedInfo(Road road, double timeDifference, double distance, Date intersectionTime) {
 		SpeedInfo info = new SpeedInfo();
+		double speed = distance / timeDifference;
 
 		info.setWayGid(road.getId());
 		info.setTime(intersectionTime);
 		if (road.isReversed()) {
 			info.setReverseWaySpeed(speed);
+			info.setReverseDistance(distance);
 		} else {
 			info.setDirectWaySpeed(speed);
+			info.setDirectDistance(distance);
 		}
 
 		return info;

@@ -23,7 +23,7 @@ public class LocationBuffer {
 	public synchronized List<LocationInfo> getLocations() {
 		return locations;
 	}
-	
+
 	public synchronized List<LocationInfo> getAndClearLocations() {
 		List<LocationInfo> result = new ArrayList<LocationInfo>(locations);
 		locations.clear();

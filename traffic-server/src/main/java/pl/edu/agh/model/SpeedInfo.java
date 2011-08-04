@@ -21,6 +21,8 @@ public class SpeedInfo {
 	public static final String COL_WAY_GID = "way_gid";
 	public static final String COL_DIRECT_WAY_SPEED = "direct_way_speed";
 	public static final String COL_REVERSE_WAY_SPEED = "reverse_way_speed";
+	public static final String COL_DIRECT_DISTANCE = "direct_distance";
+	public static final String COL_REVERSE_DISTANCE = "reverse_distance";
 	public static final String COL_TIME = "time";
 
 	@Id
@@ -33,9 +35,13 @@ public class SpeedInfo {
 	private Double directWaySpeed;
 	@Column(name = COL_REVERSE_WAY_SPEED)
 	private Double reverseWaySpeed;
+	@Column(name = COL_DIRECT_DISTANCE)
+	private Double directDistance;
+	@Column(name = COL_REVERSE_DISTANCE)
+	private Double reverseDistance;
 	@Column(name = COL_TIME)
 	private Date time;
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -66,6 +72,22 @@ public class SpeedInfo {
 
 	public void setReverseWaySpeed(Double reverseWaySpeed) {
 		this.reverseWaySpeed = reverseWaySpeed;
+	}
+	
+	public Double getDirectDistance() {
+		return directDistance;
+	}
+
+	public void setDirectDistance(Double directDistance) {
+		this.directDistance = directDistance;
+	}
+
+	public Double getReverseDistance() {
+		return reverseDistance;
+	}
+
+	public void setReverseDistance(Double reverseDistance) {
+		this.reverseDistance = reverseDistance;
 	}
 
 	public Date getTime() {

@@ -27,14 +27,13 @@ public class PathWithoutUTurnsSplitterTest {
 		List<LineString> lineStrings = newArrayList(geometryFactory.createLineString(new Coordinate[] {
 				new Coordinate(0, 0), new Coordinate(1, 1) }));
 		Road road1 = new Road(lineStrings, 1, 1, 2, false);
-		Road road2 = new Road(lineStrings, 2, 2, 1, false);
-		Road road3 = new Road(lineStrings, 3, 1, 2, false);
+		Road road2 = new Road(lineStrings, 1, 2, 1, true);
 
 		Coordinate coordinate = new Coordinate(0, 0);
 
 		Path path = Path.createPath(coordinate, road1, null).matchPointToLastRoad(coordinate, null)
 				.matchPointToLastRoad(coordinate, null).matchPointToRoad(coordinate, road2, null)
-				.matchPointToLastRoad(coordinate, null).matchPointToRoad(coordinate, road3, null)
+				.matchPointToLastRoad(coordinate, null).matchPointToRoad(coordinate, road1, null)
 				.matchPointToLastRoad(coordinate, null);
 
 		List<Path> transformedPaths = transformer.split(path);
@@ -68,7 +67,7 @@ public class PathWithoutUTurnsSplitterTest {
 		List<LineString> lineStrings = newArrayList(geometryFactory.createLineString(new Coordinate[] {
 				new Coordinate(0, 0), new Coordinate(1, 1) }));
 		Road road1 = new Road(lineStrings, 1, 1, 2, false);
-		Road road2 = new Road(lineStrings, 2, 2, 1, false);
+		Road road2 = new Road(lineStrings, 1, 2, 1, true);
 		Road road3 = new Road(lineStrings, 3, 1, 3, false);
 
 		Coordinate coordinate = new Coordinate(0, 0);
@@ -90,7 +89,7 @@ public class PathWithoutUTurnsSplitterTest {
 				new Coordinate(0, 0), new Coordinate(1, 1) }));
 		Road road1 = new Road(lineStrings, 1, 1, 2, false);
 		Road road2 = new Road(lineStrings, 2, 2, 3, false);
-		Road road3 = new Road(lineStrings, 3, 3, 2, false);
+		Road road3 = new Road(lineStrings, 2, 3, 2, true);
 
 		Coordinate coordinate = new Coordinate(0, 0);
 
@@ -111,7 +110,7 @@ public class PathWithoutUTurnsSplitterTest {
 				new Coordinate(0, 0), new Coordinate(1, 1) }));
 		Road road1 = new Road(lineStrings, 1, 1, 2, false);
 		Road road2 = new Road(lineStrings, 2, 2, 3, false);
-		Road road3 = new Road(lineStrings, 3, 3, 2, false);
+		Road road3 = new Road(lineStrings, 2, 3, 2, true);
 		Road road4 = new Road(lineStrings, 4, 2, 4, false);
 
 		Coordinate coordinate = new Coordinate(0, 0);

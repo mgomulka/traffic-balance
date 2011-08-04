@@ -1,6 +1,13 @@
 package net.osmand.plus.activities;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -317,6 +324,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		// it tries to continue the last route
 		if(!Algoritms.objectEquals(routingHelper.getFinalLocation(), pointToNavigate)){
 			routingHelper.setFollowingMode(false);
+			OsmandSettings.setFollowingByRoute(this, false);
 			stopLogger();
 			routingHelper.setFinalAndCurrentLocation(pointToNavigate, null);
 
@@ -331,6 +339,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						routingHelper.setFollowingMode(true);
+						OsmandSettings.setFollowingByRoute(MapActivity.this, true);
 						startLogger();
 						((OsmandApplication)getApplication()).showDialogInitializingCommandPlayer(MapActivity.this);
 					}
@@ -338,6 +347,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 				builder.setNegativeButton(R.string.default_buttons_no, new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						routingHelper.setFollowingMode(false);
 						OsmandSettings.setFollowingByRoute(MapActivity.this, false);
 						routingHelper.setFinalLocation(null);
 						mapView.refreshMap();
@@ -1109,8 +1119,8 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     			if(routingHelper.isRouteCalculated()){
     				routingHelper.setFinalAndCurrentLocation(null, null);
     				OsmandSettings.setFollowingByRoute(MapActivity.this, false);
-    				stopLogger();
     				routingHelper.setFollowingMode(false);
+    				stopLogger();
     			} else {
     				navigateToPoint(null);
     			}
@@ -1721,6 +1731,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 					loc.setLongitude(longitude);
 					loc.setTime(new Date());
 					LocationBuffer.INSTANCE.addLocation(loc);
+					
 				} else if(standardId == R.string.context_menu_item_search_poi){
 					Intent intent = new Intent(MapActivity.this, SearchPoiFilterActivity.class);
 					intent.putExtra(SearchPoiFilterActivity.SEARCH_LAT, latitude);

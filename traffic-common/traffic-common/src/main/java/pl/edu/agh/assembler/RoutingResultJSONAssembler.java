@@ -23,7 +23,7 @@ public class RoutingResultJSONAssembler extends AbstractJSONAssembler<RoutingRes
 		JSONObject serializedRoutingResult = new JSONObject();
 
 		serializedRoutingResult.put(LOCATIONS_PARAM, locationAssembler.serialize(routingResult.getLocations()));
-		
+
 		return serializedRoutingResult;
 	}
 
@@ -31,6 +31,7 @@ public class RoutingResultJSONAssembler extends AbstractJSONAssembler<RoutingRes
 	public RoutingResult deserialize(JSONObject serializedEntity) throws JSONException {
 		List<SimpleLocationInfo> locations = locationAssembler.deserialize(serializedEntity
 				.getJSONArray(LOCATIONS_PARAM));
+
 		return new RoutingResult(locations);
 	}
 

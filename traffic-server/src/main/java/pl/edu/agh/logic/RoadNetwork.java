@@ -29,10 +29,12 @@ public class RoadNetwork {
 	private GeometryFactory geometryFactory;
 	private List<Road> roads;
 	private Multimap<Integer, Road> roadsBySource;
+	private Multimap<Integer, Road> roadsById;
 
-	public RoadNetwork(List<Way> ways, GeometryFactory geometryFactory, double gpsAccuracy) {
+	public RoadNetwork(List<Way> ways, GeometryFactory geometryFactory) {
 		this.geometryFactory = geometryFactory;
 		this.roadsBySource = ArrayListMultimap.create();
+		this.roadsById = ArrayListMultimap.create();
 		this.roads = newArrayListWithCapacity(ways.size());
 
 		for (Way way : ways) {
@@ -69,7 +71,8 @@ public class RoadNetwork {
 
 		Road registeredRoad = new Road(segments, id, source, target, reversed);
 		roads.add(registeredRoad);
-		roadsBySource.put(source, registeredRoad);
+		roadsBySource.put(registeredRoad.getSource(), registeredRoad);
+		roadsById.put(registeredRoad.getId(), registeredRoad);
 	}
 
 	private LineString createRoadSegment(Point start, Point end, double distance) {
@@ -102,5 +105,9 @@ public class RoadNetwork {
 
 	public Collection<Road> getRoadsBySource(int source) {
 		return roadsBySource.get(source);
+	}
+	
+	public Collection<Road> getRoadsById(int id) {
+		return roadsById.get(id);
 	}
 }

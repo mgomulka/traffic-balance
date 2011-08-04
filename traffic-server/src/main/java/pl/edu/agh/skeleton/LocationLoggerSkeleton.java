@@ -26,9 +26,9 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 
 	@Autowired
 	private LocationDataJSONAssembler locationDataJSONAssembler;
-	
+
 	@Autowired
-	LocationInfoJSONAssembler locationInfoJSONAssembler;
+	private LocationInfoJSONAssembler locationInfoJSONAssembler;
 
 	@Override
 	protected JSONObject invoke(String methodName, JSONArray params) throws JSONException, JSONRPCException,
@@ -43,7 +43,6 @@ public class LocationLoggerSkeleton extends JSONRPCSkeleton {
 
 	private JSONObject invokeSendLocationData(JSONArray params) throws JSONRPCException, JSONException {
 		LocationData locationData = locationDataJSONAssembler.deserialize(params.getJSONObject(0));
-		//System.out.println(params.getJSONObject(0).toString());
 		for (LocationInfo info : locationData.getLocationInfos()) {
 			System.out.println(locationInfoJSONAssembler.serialize(info));
 		}
