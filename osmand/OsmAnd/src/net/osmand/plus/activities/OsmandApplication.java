@@ -8,8 +8,6 @@ import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 
-import pl.edu.agh.logic.TrafficDataProvider;
-
 import net.osmand.Algoritms;
 import net.osmand.LogUtil;
 import net.osmand.plus.FavouritesDbHelper;
@@ -20,10 +18,12 @@ import net.osmand.plus.ProgressDialogImplementation;
 import net.osmand.plus.R;
 import net.osmand.plus.ResourceManager;
 import net.osmand.plus.voice.CommandPlayer;
+import pl.edu.agh.adhoc.AdHocModule;
+import pl.edu.agh.logic.TrafficDataProvider;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Application;
 import android.app.ProgressDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +41,7 @@ public class OsmandApplication extends Application {
 	FavouritesDbHelper favorites = null;
 	CommandPlayer player = null;
 	TrafficDataProvider trafficDataProvider;
+	AdHocModule adHocModule;
 	
 	// start variables
 	private ProgressDialogImplementation startDialog;
@@ -55,10 +56,21 @@ public class OsmandApplication extends Application {
     	super.onCreate();
     	routingHelper = new RoutingHelper(OsmandSettings.getApplicationMode(OsmandSettings.getPrefs(OsmandApplication.this)), OsmandApplication.this, player);
     	trafficDataProvider = new TrafficDataProvider();
+    	adHocModule = new AdHocModule(this);
+    	adHocModule.init();
     	manager = new ResourceManager(this);
     	daynightHelper = new DayNightHelper(this);
     	uiHandler = new Handler();
     	startApplication();
+	}
+    
+    @Override
+	public void onTerminate() {
+		adHocModule.finish();
+	}
+    
+    public AdHocModule getAdHocModule() {
+		return adHocModule;
 	}
     
     public PoiFiltersHelper getPoiFilters() {
