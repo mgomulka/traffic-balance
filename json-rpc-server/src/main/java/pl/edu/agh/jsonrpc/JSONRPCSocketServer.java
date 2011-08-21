@@ -16,9 +16,11 @@ public class JSONRPCSocketServer {
 		this.skeleton = skeleton;
 	}
 
-	public synchronized void start() throws JSONRPCException {
-		if(!socket.isOpened()) {
-			return;
+	public void start() throws JSONRPCException {
+		synchronized (this) {
+			if(!socket.isOpened()) {
+				return;
+			}
 		}
 		try {
 			byte[] buffer = socket.receiveData(); 

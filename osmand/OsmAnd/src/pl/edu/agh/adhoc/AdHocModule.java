@@ -248,10 +248,10 @@ public class AdHocModule {
 		this.notificationManager.cancelAll();
 		AdHocModule.this.removeFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/ad_hoc.pid");
 		
-		this.socket.close();
 		if(trafficDataProvider != null) {
 			trafficDataProvider.stopAdHocServer();
 		}
+		this.socket.close();
 		this.enableWifi();
 		return stopped;
     }

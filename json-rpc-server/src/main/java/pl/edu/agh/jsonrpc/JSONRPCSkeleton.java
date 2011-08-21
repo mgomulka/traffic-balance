@@ -3,7 +3,6 @@ package pl.edu.agh.jsonrpc;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +11,7 @@ public abstract class JSONRPCSkeleton {
 
 	protected abstract JSONObject invoke(String methodName, JSONArray params) throws Exception;
 	
-	private Logger log = Logger.getLogger(this.getClass());
+//	private Logger log = Logger.getLogger(this.getClass());
 	
 	protected static final JSONObject NULL_RESULT;
 	static {
@@ -37,7 +36,7 @@ public abstract class JSONRPCSkeleton {
 			try {
 				jsonResponse.put(JSONRPCConstants.ERROR_KEY, ex.getMessage());
 			} catch (JSONException e) {
-				log.error("Error during creating response", ex);
+				throw new RuntimeException("Error while creating response", e);
 			}
 		}
 		

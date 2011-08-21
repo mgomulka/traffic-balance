@@ -1,13 +1,6 @@
 package net.osmand.plus.activities;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -183,6 +176,8 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 	private int currentMapRotation;
 	private boolean currentShowingAngle;
 	
+	private OsmandApplication application;
+	
 	private Dialog progressDlg = null;
 	private SharedPreferences settings;
 	
@@ -221,6 +216,7 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.application = (OsmandApplication)this.getApplication();
 		settings = OsmandSettings.getPrefs(this);		
 		// for voice navigation
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -1030,6 +1026,13 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_menu, menu);
+		
+		MenuItem item = menu.findItem(R.id.map_enable_ad_hoc);
+		if(application.adHocModule.isProcessRunning()) {
+			item.setChecked(true);
+		} else {
+			item.setChecked(false);
+		}
 		return true;
 	}
 	
@@ -1134,6 +1137,14 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
     	} else if (item.getItemId() == R.id.map_show_point_options) {
 			contextMenuPoint(mapView.getLatitude(), mapView.getLongitude());
     		return true;
+    	} else if (item.getItemId() == R.id.map_enable_ad_hoc) {
+    		if(item.isChecked()) {
+    			stopAdHoc();
+    			item.setChecked(false);
+    		} else {
+    			startAdHoc();
+    			item.setChecked(true);
+    		}
     	}
     	return super.onOptionsItemSelected(item);
     }
@@ -1920,4 +1931,41 @@ public class MapActivity extends Activity implements IMapLocationListener, Senso
 		stopService(new Intent(MapActivity.this, LocationLogger.class));
 	}
 
+	public void startAdHoc() {
+		new Thread(new Runnable(){
+             public void run(){
+				if (application.adHocModule.startupCheckPerformed == false) {
+		            application.adHocModule.startupCheckPerformed = true;
+		            
+		            // Check root-permission, files
+		            if (!application.adHocModule.coretask.hasRootPermission())
+		                Toast.makeText(MapActivity.this, "No root permission. Ad-hoc disabled!", Toast.LENGTH_SHORT).show();
+		            
+		            // Check if binaries need to be updated
+		            if (application.adHocModule.binariesExists() == false) {
+		                if (application.adHocModule.coretask.hasRootPermission()) {
+		                    application.adHocModule.installFiles();
+		                }
+		            }
+		            // Check if native-library needs to be moved
+		            application.adHocModule.renewLibrary();            
+		        }
+				if(!application.adHocModule.isProcessRunning()) {
+					application.adHocModule.startAdHoc();
+					application.adHocModule.showStartNotification();
+				}
+            }
+		}).start();
+	}
+	
+	public void stopAdHoc() {
+		new Thread(new Runnable() {
+			public void run() {
+				if(application.adHocModule.isProcessRunning()) {
+					application.adHocModule.stopAdHoc();
+					application.adHocModule.notificationManager.cancelAll();
+				}
+			}
+		}).start();
+	}
 }
