@@ -16,17 +16,17 @@ public class AdHocBroadcastSocket implements RawDataSocket {
 	public int port;
 	
 	
-	public void open(InetAddress listenAddress, int port) throws SocketException {
+	public synchronized void open(InetAddress listenAddress, int port) throws SocketException {
 		this.port = port;
 		socket = new DatagramSocket(port, listenAddress);
 		socket.setBroadcast(true);
 	}
 	
-	public boolean isOpened() {
+	public synchronized boolean isOpened() {
 		return socket != null && !socket.isClosed();
 	}
 	
-	public void sendData(byte[] data) throws IOException {
+	public synchronized void sendData(byte[] data) throws IOException {
 		if(socket == null) {
 			throw new IllegalStateException("socket closed");
 		}
@@ -35,7 +35,7 @@ public class AdHocBroadcastSocket implements RawDataSocket {
 		socket.send(packet);
 	}
 	
-	public byte[] receiveData() throws IOException {
+	public synchronized byte[] receiveData() throws IOException {
 		if(socket == null) {
 			throw new IllegalStateException("socket closed");
 		}
@@ -46,7 +46,7 @@ public class AdHocBroadcastSocket implements RawDataSocket {
 		return buf;
 	}
 
-	public void close() {
+	public synchronized void close() {
 		if(socket == null) {
 			return;
 		}

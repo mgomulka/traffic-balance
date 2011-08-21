@@ -9,6 +9,7 @@ import pl.edu.agh.bo.RoutingBO;
 import pl.edu.agh.bo.RoutingBO.Error;
 import pl.edu.agh.exception.BusinessException;
 import pl.edu.agh.jsonrpc.JSONRPCException;
+import pl.edu.agh.jsonrpc.RawDataSocket;
 import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
@@ -80,6 +81,19 @@ public class TrafficServiceImpl implements TrafficService {
 			}
 		});
 		return trafficInfos;
+	}
+
+	@Override
+	public void configAdHoc(RawDataSocket socket, AsyncDataListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TrafficData getTrafficDataViaAdHoc(SimpleLocationInfo location,
+			double radius) throws JSONRPCException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

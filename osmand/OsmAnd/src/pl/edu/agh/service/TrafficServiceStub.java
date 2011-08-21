@@ -1,5 +1,8 @@
 package pl.edu.agh.service;
 
+import java.util.Random;
+import java.util.concurrent.Executors;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,15 +11,25 @@ import pl.edu.agh.assembler.SimpleLocationInfoJSONAssembler;
 import pl.edu.agh.assembler.TrafficDataJSONAssembler;
 import pl.edu.agh.assembler.TrafficInfoJSONAssembler;
 import pl.edu.agh.jsonrpc.JSONRPCException;
+import pl.edu.agh.jsonrpc.JSONRPCSocketClient;
+import pl.edu.agh.jsonrpc.RawDataSocket;
 import pl.edu.agh.model.RoutingResult;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
+import android.util.Log;
 
-public class TrafficServiceStub extends AbstractServiceStub implements TrafficService {
+public class TrafficServiceStub extends AbstractServiceStub implements TrafficService, AsyncDataReceiver {
 
+	public static final int AD_HOC_WAITING_FOR_RESPONSE_TIMEOUT = 30*60*1000; 
+	
 	private TrafficDataJSONAssembler trafficDataJSONAssembler;
 	private SimpleLocationInfoJSONAssembler simpleLocationInfoJSONAssembler;
 	private RoutingResultJSONAssembler routingResultJSONAssembler;
+	private AsyncDataListener asyncDataListener;
+	
+	private boolean waitingForBroadCast = false;
+	private JSONObject lastReceivedAsyncObject = null;
+	private long lastRequestId = 0;
 	
 	private static final TrafficServiceStub INSTANCE = new TrafficServiceStub();
 	public static TrafficServiceStub getInstance() {
@@ -53,6 +66,67 @@ public class TrafficServiceStub extends AbstractServiceStub implements TrafficSe
 		} catch (JSONException ex) {
 			throw new JSONRPCException("Error during (de)serialization", ex);
 		}
+	}
+
+	public synchronized void dataReceived(JSONObject object) {
+		lastReceivedAsyncObject = object;
+		this.notify();
+	}
+	
+	public long getRequestCode() {
+		return lastRequestId;
+	}
+	
+	@Override
+	public TrafficData getTrafficDataViaAdHoc(SimpleLocationInfo location, double radius) throws JSONRPCException {
+		try {
+			lastRequestId = new Random(System.currentTimeMillis()).nextLong();
+			JSONObject serializedLocation = simpleLocationInfoJSONAssembler.serialize(location);
+			
+			Runnable timeoutTask = new Runnable() {
+				public void run() {
+					try {
+						
+						Thread.sleep(AD_HOC_WAITING_FOR_RESPONSE_TIMEOUT);
+						synchronized (TrafficServiceStub.this) {
+							waitingForBroadCast = false;
+							TrafficServiceStub.this.notify();
+						}
+						
+					} catch(InterruptedException e) {
+						Log.i(Thread.currentThread().getName(), "thread interrupted", e);
+					}
+				}
+			};
+			
+			Executors.newSingleThreadExecutor().execute(timeoutTask);
+			asyncDataListener.registerReceiver(this);
+			rpcAdHocClient.callJSONObject(GET_TRAFFIC_DATA_METHOD, serializedLocation, radius);
+			
+			synchronized (this) {
+				waitingForBroadCast = true;
+				try {
+					while(waitingForBroadCast) {
+						this.wait();
+					}
+				} catch(InterruptedException e) {
+					Log.i(Thread.currentThread().getName(), "thread interrupted", e);
+				}
+				TrafficData response = trafficDataJSONAssembler.deserialize(lastReceivedAsyncObject);
+				lastReceivedAsyncObject = null;
+				return response;
+			}
+			
+		} catch (JSONException ex) {
+			throw new JSONRPCException("Error during (de)serialization", ex);
+		}
+
+	}
+
+	@Override
+	public void configAdHoc(RawDataSocket socket, AsyncDataListener listener) {
+		this.rpcAdHocClient = new JSONRPCSocketClient(socket);
+		this.asyncDataListener = listener;
 	}
 
 }

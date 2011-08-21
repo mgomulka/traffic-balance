@@ -6,16 +6,17 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.Writer;
 
-public abstract class JSONRPCSocketServer {
+public class JSONRPCSocketServer {
 	
-	protected JSONRPCSkeleton skeleton;
+	protected final JSONRPCSkeleton skeleton;
 	private final RawDataSocket socket;
 	
-	public JSONRPCSocketServer(RawDataSocket socket) {
+	public JSONRPCSocketServer(RawDataSocket socket, JSONRPCSkeleton skeleton) {
 		this.socket = socket; 
+		this.skeleton = skeleton;
 	}
 
-	public void start() throws JSONRPCException {
+	public synchronized void start() throws JSONRPCException {
 		if(!socket.isOpened()) {
 			return;
 		}
@@ -44,7 +45,7 @@ public abstract class JSONRPCSocketServer {
 		}
 	}
 	
-	public void stop() {
+	public synchronized void stop() {
 		if(socket.isOpened()) {
 			socket.close();
 		}

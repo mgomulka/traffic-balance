@@ -55,9 +55,10 @@ public class OsmandApplication extends Application {
     public void	onCreate(){
     	super.onCreate();
     	routingHelper = new RoutingHelper(OsmandSettings.getApplicationMode(OsmandSettings.getPrefs(OsmandApplication.this)), OsmandApplication.this, player);
-    	trafficDataProvider = new TrafficDataProvider();
     	adHocModule = new AdHocModule(this);
     	adHocModule.init();
+    	trafficDataProvider = new TrafficDataProvider(adHocModule);
+    	adHocModule.setTrafficDataProvider(trafficDataProvider);
     	manager = new ResourceManager(this);
     	daynightHelper = new DayNightHelper(this);
     	uiHandler = new Handler();

@@ -5,15 +5,19 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import pl.edu.agh.adhoc.AdHocModule;
 import pl.edu.agh.jsonrpc.JSONRPCException;
+import pl.edu.agh.jsonrpc.JSONRPCSocketServer;
 import pl.edu.agh.model.RectD;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
+import pl.edu.agh.service.TrafficAdHocDispatchService;
 import pl.edu.agh.service.TrafficService;
 import pl.edu.agh.service.TrafficServiceStub;
 import pl.edu.agh.utils.DateUtils;
 import pl.edu.agh.utils.GeometryUtils;
 import android.graphics.RectF;
+import android.util.Log;
 
 public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 
@@ -79,11 +83,44 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 
 	private TrafficService trafficService = TrafficServiceStub.getInstance();
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
-
+	private final AdHocModule adHocModule;
+	private final JSONRPCSocketServer adHocServer;
+	private final TrafficAdHocDispatchService adHocDispatchService;
 	private TrafficDataRequest lastRequest;
 	private TrafficDataSet lastFetchedDataSet = new TrafficDataSet();
 	private Status currentStatus;
 
+	public TrafficDataProvider(AdHocModule adHocModule) {
+		
+		this.adHocModule = adHocModule;
+		adHocDispatchService = new TrafficAdHocDispatchService(this, adHocModule.socket);
+		trafficService.configAdHoc(adHocModule.socket, adHocDispatchService);
+		adHocServer = new JSONRPCSocketServer(adHocModule.socket, adHocDispatchService);
+		
+	}
+	
+	public void startAdHocServer() {
+		
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+
+					adHocServer.start();
+					
+				} catch (JSONRPCException e) {
+					
+					Log.e("Ad Hoc Dispatch", e.getMessage(), e);
+				}
+			}
+		}).start();
+
+	}
+	
+	public void stopAdHocServer() {
+
+		adHocServer.stop();
+	}
+	
 	private void trafficDataProvided(final TrafficData trafficData) {
 		forAllListeners(new ListenerTask<TrafficDataListener>() {
 
@@ -119,6 +156,17 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 		return lastFetchedDataSet.getTrafficData();
 	}
 
+	public synchronized TrafficData getCachedTrafficDataIfAvailable(SimpleLocationInfo location, double radius) {
+		if(lastRequest == null || lastFetchedDataSet == null) {
+			return null;
+		}
+		
+		SimpleLocationInfo cachedLocation = lastRequest.getLocation();
+		double cachedRadius = calculateRadiusForZoom(lastRequest.getZoom());
+		//TODO matching criterion
+		return lastFetchedDataSet.getTrafficData();
+	}
+	
 	private synchronized void updateLastRequest(Status status, TrafficDataRequest request, TrafficDataSet fetchedDataSet) {
 		lastRequest = new TrafficDataRequest(request.getLocation(), request.getZoom(), new Date());
 		currentStatus = status;
@@ -168,8 +216,16 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 							request.getLocation(), radius);
 					status = Status.COMPLETED;
 				} catch (JSONRPCException e) {
-					fetchedData = null;
-					status = Status.ERROR;
+
+					try {
+						fetchedData = alternativeRequestData(request);
+						status = Status.COMPLETED;
+						
+					} catch (JSONRPCException e2) {
+						fetchedData = null;
+						status = Status.ERROR;
+					}
+					
 				}
 				updateLastRequest(status, request,
 						new TrafficDataSet(fetchedData, GeometryUtils.createBoundingBox(request.getLocation(), radius)));
@@ -179,6 +235,16 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 
 		});
 	}
+	
+	private TrafficData alternativeRequestData(final TrafficDataRequest request) throws JSONRPCException {
+
+		if(adHocModule.isProcessRunning()) {
+			return trafficService.getTrafficDataViaAdHoc(request.getLocation(), calculateRadiusForZoom(request.getZoom()));
+		} 
+		throw new JSONRPCException("Ad Hoc not available");
+	}
+	
+	
 
 	private double calculateRadiusForZoom(int zoom) {
 		zoom = Math.min(zoom, MAX_ZOOM);

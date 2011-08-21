@@ -14,6 +14,7 @@ import net.osmand.plus.R;
 import net.osmand.plus.activities.MainMenuActivity;
 import pl.edu.agh.adhoc.system.Configuration;
 import pl.edu.agh.adhoc.system.CoreTask;
+import pl.edu.agh.logic.TrafficDataProvider;
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -68,9 +69,15 @@ public class AdHocModule {
 	// CoreTask
 	public CoreTask coretask = null;
 	public AdHocBroadcastSocket socket = null;
+	public TrafficDataProvider trafficDataProvider = null;
 	
 	public AdHocModule(Application application) {
 		this.application = application;
+		
+	}
+	
+	public void setTrafficDataProvider(TrafficDataProvider trafficDataProvider) {
+		this.trafficDataProvider = trafficDataProvider;
 	}
 	
 	public void init() {
@@ -226,7 +233,10 @@ public class AdHocModule {
 			} catch (SocketException e) {
 				Log.e(MSG_TAG, "ad-hoc broad cast socket error", e);
 			}
-	    	return true;
+			if(trafficDataProvider != null) {
+				trafficDataProvider.startAdHocServer();
+			}
+			return true;
     		
     	}
     	return false;
@@ -239,7 +249,9 @@ public class AdHocModule {
 		AdHocModule.this.removeFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/ad_hoc.pid");
 		
 		this.socket.close();
-		
+		if(trafficDataProvider != null) {
+			trafficDataProvider.stopAdHocServer();
+		}
 		this.enableWifi();
 		return stopped;
     }
