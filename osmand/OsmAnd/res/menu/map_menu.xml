@@ -20,6 +20,7 @@
 <!-- for test only -->
 <item android:id="@+id/map_menu_send_points" android:title="@string/map_menu_send_points"></item>
 <item android:id="@+id/map_menu_clear_points" android:title="@string/map_menu_clear_points"></item>
+<item android:id="@+id/map_enable_ad_hoc" android:checkable="true" android:checked="false" android:title="@string/toggle_ad_hoc_label"></item>
 </group>
 
 
