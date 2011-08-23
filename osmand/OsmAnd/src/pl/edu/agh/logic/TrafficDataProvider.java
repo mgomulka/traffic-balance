@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import pl.edu.agh.adhoc.AdHocModule;
 import pl.edu.agh.jsonrpc.JSONRPCException;
 import pl.edu.agh.jsonrpc.JSONRPCSocketServer;
+import pl.edu.agh.jsonrpc.RawDataSocket;
 import pl.edu.agh.model.RectD;
 import pl.edu.agh.model.SimpleLocationInfo;
 import pl.edu.agh.model.TrafficData;
@@ -34,7 +35,7 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 		FETCHING, COMPLETED, ERROR;
 	}
 
-	private class TrafficDataRequest {
+	public static class TrafficDataRequest {
 		private SimpleLocationInfo location;
 		private int zoom;
 		private Date requestTime;
@@ -59,7 +60,7 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 
 	}
 
-	private class TrafficDataSet {
+	public static class TrafficDataSet {
 		private TrafficData trafficData;
 		private RectD bound;
 
@@ -99,6 +100,19 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 		
 	}
 	
+	/*
+	 *  for testing
+	 */
+	public TrafficDataProvider(RawDataSocket socket, TrafficDataRequest request, TrafficDataSet data) {
+	
+		lastFetchedDataSet = data;
+		lastRequest = request;
+		adHocModule = null;
+		adHocDispatchService = new TrafficAdHocDispatchService(this, socket);
+		trafficService.configAdHoc(socket, adHocDispatchService);
+		adHocServer = new JSONRPCSocketServer(socket, adHocDispatchService);
+	}
+	
 	public void startAdHocServer() {
 		
 		new Thread(new Runnable() {
@@ -119,6 +133,10 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 	public void stopAdHocServer() {
 
 		adHocServer.stop();
+	}
+	
+	public TrafficService getTrafficService() {
+		return trafficService;
 	}
 	
 	private void trafficDataProvided(final TrafficData trafficData) {
@@ -251,7 +269,7 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 	
 	
 
-	private double calculateRadiusForZoom(int zoom) {
+	public static double calculateRadiusForZoom(int zoom) {
 		zoom = Math.min(zoom, MAX_ZOOM);
 		return OSMAND_BASE_RADIUS * 2 * Math.pow(ZOOM_MULTIPLIER, MAX_ZOOM - zoom);
 	}

@@ -20,7 +20,7 @@ import android.util.Log;
 
 public class TrafficServiceStub extends AbstractServiceStub implements TrafficService, AsyncDataReceiver {
 
-	public static final int AD_HOC_WAITING_FOR_RESPONSE_TIMEOUT = 30*60*1000; 
+	public static final int AD_HOC_WAITING_FOR_RESPONSE_TIMEOUT = 30*1000; 
 	
 	private TrafficDataJSONAssembler trafficDataJSONAssembler;
 	private SimpleLocationInfoJSONAssembler simpleLocationInfoJSONAssembler;
@@ -70,6 +70,7 @@ public class TrafficServiceStub extends AbstractServiceStub implements TrafficSe
 
 	public synchronized void dataReceived(JSONObject object) {
 		lastReceivedAsyncObject = object;
+		waitingForBroadCast = false;
 		this.notify();
 	}
 	
@@ -101,7 +102,7 @@ public class TrafficServiceStub extends AbstractServiceStub implements TrafficSe
 			
 			Executors.newSingleThreadExecutor().execute(timeoutTask);
 			asyncDataListener.registerReceiver(this);
-			rpcAdHocClient.callJSONObject(GET_TRAFFIC_DATA_METHOD, serializedLocation, radius);
+			rpcAdHocClient.callJSONObject(GET_TRAFFIC_DATA_METHOD, serializedLocation, radius, lastRequestId);
 			
 			synchronized (this) {
 				waitingForBroadCast = true;
@@ -112,7 +113,7 @@ public class TrafficServiceStub extends AbstractServiceStub implements TrafficSe
 				} catch(InterruptedException e) {
 					Log.i(Thread.currentThread().getName(), "thread interrupted", e);
 				}
-				TrafficData response = trafficDataJSONAssembler.deserialize(lastReceivedAsyncObject);
+				TrafficData response = (lastReceivedAsyncObject != null) ? trafficDataJSONAssembler.deserialize(lastReceivedAsyncObject) : null;
 				lastReceivedAsyncObject = null;
 				return response;
 			}

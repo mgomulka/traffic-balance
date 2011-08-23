@@ -1,7 +1,5 @@
 package pl.edu.agh.jsonrpc;
 
-import java.io.IOException;
-
 import org.json.JSONObject;
 
 public class JSONRPCSocketClient extends JSONRPCClient {
@@ -22,9 +20,14 @@ public class JSONRPCSocketClient extends JSONRPCClient {
 			String data = request.toString();
 			socket.sendData(data.getBytes());
 			
-		} catch (IOException e) {
+			JSONObject result = new JSONObject();
+			JSONObject resultOK = new JSONObject();
+			resultOK.put("result", "OK");
+			result.put(JSONRPCConstants.RESULT_KEY, resultOK);
+			
+			return result;
+		} catch (Exception e) {
 			throw new JSONRPCException(e.getMessage());
 		}
-		return new JSONObject();
 	}
 }
