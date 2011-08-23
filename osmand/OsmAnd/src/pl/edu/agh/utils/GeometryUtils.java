@@ -22,4 +22,10 @@ public class GeometryUtils {
 
 		return false;
 	}
+	
+	public static double euklideanDist(SimpleLocationInfo d1, SimpleLocationInfo d2) {
+		
+		return Math.sqrt(Math.pow(d1.getLatitude() - d2.getLatitude(),2.0) + Math.pow(d1.getLongitude() - d2.getLongitude(), 2.0));
+	}
+	
 }

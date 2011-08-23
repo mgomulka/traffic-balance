@@ -163,8 +163,13 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 		
 		SimpleLocationInfo cachedLocation = lastRequest.getLocation();
 		double cachedRadius = calculateRadiusForZoom(lastRequest.getZoom());
-		//TODO matching criterion
-		return lastFetchedDataSet.getTrafficData();
+		
+		if((GeometryUtils.euklideanDist(location, cachedLocation) < cachedRadius/4.0)
+				&& radius <= cachedRadius*1.25) {
+			return lastFetchedDataSet.getTrafficData();
+		} else {
+			return null;
+		}
 	}
 	
 	private synchronized void updateLastRequest(Status status, TrafficDataRequest request, TrafficDataSet fetchedDataSet) {
