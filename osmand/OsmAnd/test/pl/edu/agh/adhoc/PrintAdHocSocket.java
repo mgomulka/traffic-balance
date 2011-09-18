@@ -12,23 +12,26 @@ public class PrintAdHocSocket implements RawDataSocket {
 	private final InputStream in;
 	private final OutputStream out;
 	private boolean opened = true;
+	private String name;
 	
-	public PrintAdHocSocket(InputStream in, OutputStream out) {
+	public PrintAdHocSocket(String name, InputStream in, OutputStream out) {
 		this.in = in;
 		this.out = out;
+		this.name = name;
 	}
 	
 	@Override
 	public void sendData(byte[] data) throws IOException {
-		System.out.println("sending:\n" + new String(data));
+		System.out.println(name + " sending:" + new String(data));
 		out.write(data);
+		out.flush();
 	}
 
 	@Override
 	public byte[] receiveData() throws IOException {
 		byte[] buffer = new byte[AdHocBroadcastSocket.RECEIVE_BUFFER_SIZE];
 		in.read(buffer);
-		System.out.println("received:\n" + (buffer != null ? new String(buffer) : "null"));
+		System.out.println(name + " received:" + (buffer != null ? new String(buffer) : "null"));
 		return buffer;
 	}
 
@@ -39,7 +42,7 @@ public class PrintAdHocSocket implements RawDataSocket {
 
 	@Override
 	public void close() {
-		System.out.println("closing socket");
+		System.out.println(name + " closing socket");
 		try {
 		
 			in.close();

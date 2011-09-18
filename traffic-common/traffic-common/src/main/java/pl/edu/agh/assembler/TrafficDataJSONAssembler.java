@@ -2,6 +2,7 @@ package pl.edu.agh.assembler;
 
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +28,14 @@ public class TrafficDataJSONAssembler extends AbstractJSONAssembler<TrafficData>
 		return serializedData;
 	}
 
+	public JSONObject serialize(JSONArray serializedInfos) throws JSONException {
+		JSONObject serializedData = new JSONObject();
+		
+		serializedData.put(INFOS_PARAM, serializedInfos);
+		
+		return serializedData;
+	}
+	
 	@Override
 	public TrafficData deserialize(JSONObject serializedData) throws JSONException {
 		List<TrafficInfo> infos = trafficInfoJSONAssembler.deserialize(serializedData.getJSONArray(INFOS_PARAM));

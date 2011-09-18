@@ -3,6 +3,7 @@ package pl.edu.agh.service;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +25,12 @@ import pl.edu.agh.model.TrafficInfo;
 
 public class TrafficServiceStubTest {
 
-	private RawDataSocket socket;
-	private TrafficDataProvider provider;
+	private RawDataSocket clientSocket;
+	private RawDataSocket serverSocket;
+	
+	private TrafficDataProvider clientProvider;
+	private TrafficDataProvider serverProvider;
+		
 	private List<SimpleLocationInfo> way = Arrays.asList(
 			
 			new SimpleLocationInfo(0.0, 0.0),
@@ -40,38 +45,80 @@ public class TrafficServiceStubTest {
 	
 	private SimpleLocationInfo locInfo = new SimpleLocationInfo(20.0, 50.0);
 	private int zoom = 10;
-	
+	private int pipeBufferSize = 900;
 	
 	@Before
 	public void init() throws IOException {
 	
-		PipedInputStream pipeIn = new PipedInputStream();
-		PipedOutputStream pipeOut = new PipedOutputStream(pipeIn);
+		PipedInputStream clientIn = new PipedInputStream();
+		PipedOutputStream serverOut = new PipedOutputStream(clientIn);
 		
-		socket = new PrintAdHocSocket(pipeIn, pipeOut);
+		PipedInputStream serverIn = new PipedInputStream();
+		PipedOutputStream clientOut = new PipedOutputStream(serverIn);
 		
+		clientSocket = new PrintAdHocSocket("Client", clientIn, clientOut);
+		serverSocket = new PrintAdHocSocket("Server", serverIn, serverOut);
 		
-		TrafficData data = new TrafficData(infos);
-		TrafficDataSet dataSet = new TrafficDataSet(data, new RectD(10.0,10.0,10.0,10.0));
-		TrafficDataRequest request = new TrafficDataRequest(locInfo, zoom, new Date());
+		clientProvider = new TrafficDataProvider(clientSocket);
+		serverProvider = new TrafficDataProvider(serverSocket);
 		
-		provider = new TrafficDataProvider(socket, request, dataSet);
-		provider.startAdHocServer();
+		clientProvider.startAdHocServer();
+		serverProvider.startAdHocServer();
+		
 	
 	}
+	
 	
 	@Test
 	public void testRequest() throws Exception {
 		
-		TrafficService service = provider.getTrafficService();
-		TrafficData data = service.getTrafficDataViaAdHoc(locInfo, TrafficDataProvider.calculateRadiusForZoom(zoom));
-		Assert.assertNotNull(data);
+		TrafficData data = new TrafficData(infos);
+		TrafficDataSet dataSet = new TrafficDataSet(data, new RectD(10.0,10.0,10.0,10.0));
+		TrafficDataRequest request = new TrafficDataRequest(locInfo, zoom, new Date());
+
+		int sentSize = infos.size();
+		
+		clientProvider.injectLastTrafficOperations(request, dataSet, pipeBufferSize);
+		serverProvider.injectLastTrafficOperations(request, dataSet, pipeBufferSize);
+		
+		TrafficService service = clientProvider.getTrafficService();
+		TrafficData response = service.getTrafficDataViaAdHoc(locInfo, TrafficDataProvider.calculateRadiusForZoom(zoom));
+		
+		Assert.assertNotNull(response);
+		Assert.assertEquals(sentSize, response.getTrafficInfos().size());
+		
+		System.out.println("SUCCESSFUL!");
+	}
+	
+	@Test
+	public void testBulkRequest() throws Exception {
+		
+		List<TrafficInfo> bulkInfos = new ArrayList<TrafficInfo>();
+		for(int i=0; i < 300; i++) {
+			bulkInfos.addAll(infos);
+		}
+		TrafficData data = new TrafficData(bulkInfos);
+		TrafficDataSet dataSet = new TrafficDataSet(data, new RectD(10.0,10.0,10.0,10.0));
+		TrafficDataRequest request = new TrafficDataRequest(locInfo, zoom, new Date());
+
+		int sentSize = bulkInfos.size();
+		
+		clientProvider.injectLastTrafficOperations(request, dataSet, pipeBufferSize);
+		serverProvider.injectLastTrafficOperations(request, dataSet, pipeBufferSize);
+		
+		TrafficService service = clientProvider.getTrafficService();
+		TrafficData response = service.getTrafficDataViaAdHoc(locInfo, TrafficDataProvider.calculateRadiusForZoom(zoom));
+		
+		Assert.assertNotNull(response);
+		Assert.assertEquals(sentSize, response.getTrafficInfos().size());
+		
 		System.out.println("SUCCESSFUL!");
 	}
 	
 	@After
 	public void finish() {
-		provider.stopAdHocServer();
+		serverProvider.stopAdHocServer();
+		clientProvider.stopAdHocServer();
 	}
 	
 }

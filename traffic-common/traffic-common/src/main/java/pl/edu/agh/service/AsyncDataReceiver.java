@@ -1,9 +1,10 @@
 package pl.edu.agh.service;
 
-import org.json.JSONObject;
+import pl.edu.agh.model.TrafficData;
 
 public interface AsyncDataReceiver {
 
 	long getRequestCode();
-	void dataReceived(JSONObject object);
+	boolean isInterested();
+	void dataReceived(TrafficData data);
 }

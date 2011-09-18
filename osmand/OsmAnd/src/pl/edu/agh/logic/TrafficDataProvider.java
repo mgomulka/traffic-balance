@@ -103,15 +103,23 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 	/*
 	 *  for testing
 	 */
-	public TrafficDataProvider(RawDataSocket socket, TrafficDataRequest request, TrafficDataSet data) {
+	public TrafficDataProvider(RawDataSocket socket) {
 	
-		lastFetchedDataSet = data;
-		lastRequest = request;
 		adHocModule = null;
 		adHocDispatchService = new TrafficAdHocDispatchService(this, socket);
+		trafficService = TrafficServiceStub.getCopy();
 		trafficService.configAdHoc(socket, adHocDispatchService);
 		adHocServer = new JSONRPCSocketServer(socket, adHocDispatchService);
 	}
+	/*
+	 *  for testing
+	 */
+	public void injectLastTrafficOperations(TrafficDataRequest request, TrafficDataSet data, int messageSize) {
+		lastRequest = request;
+		lastFetchedDataSet = data;
+		adHocDispatchService.setMessageSize(messageSize);
+	}
+	
 	
 	public void startAdHocServer() {
 		
@@ -126,7 +134,7 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 					Log.e("Ad Hoc Dispatch", e.getMessage(), e);
 				}
 			}
-		}).start();
+		}, "Ad Hoc Server").start();
 
 	}
 	
