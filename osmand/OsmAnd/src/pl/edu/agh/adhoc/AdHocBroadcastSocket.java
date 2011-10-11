@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 import pl.edu.agh.jsonrpc.RawDataSocket;
+import android.util.Log;
 
 public class AdHocBroadcastSocket implements RawDataSocket {
 
@@ -18,7 +19,12 @@ public class AdHocBroadcastSocket implements RawDataSocket {
 	
 	public void open(InetAddress listenAddress, int port) throws SocketException {
 		this.port = port;
-		socket = new DatagramSocket(port, listenAddress);
+		socket = new DatagramSocket(port);
+		socket.setBroadcast(true);
+	}
+	
+	public void rebind()  throws SocketException {
+		socket = new DatagramSocket(this.port);
 		socket.setBroadcast(true);
 	}
 	
@@ -29,6 +35,10 @@ public class AdHocBroadcastSocket implements RawDataSocket {
 	public synchronized void sendData(byte[] data) throws IOException {
 		if(socket == null) {
 			throw new IllegalStateException("socket closed");
+		}
+		if(socket.isClosed() || !socket.isBound()) {
+			Log.i("Ad-Hoc Socket", "rebinding socket");
+			rebind();
 		}
 		InetAddress address = InetAddress.getByName(BROADCAST_ADDRESS);
 		DatagramPacket packet = new DatagramPacket(data, data.length, address, port);

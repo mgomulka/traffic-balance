@@ -19,7 +19,15 @@ public class JSONRPCSocketServer {
 	public void start() throws JSONRPCException {
 		synchronized (this) {
 			if(!socket.isOpened()) {
-				return;
+				try {
+
+					socket.rebind();
+					if(socket.isOpened()) {
+						return;
+					}
+				} catch(Exception e) {
+					return;
+				}
 			}
 		}
 		try {

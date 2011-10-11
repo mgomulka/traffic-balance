@@ -3,6 +3,7 @@ package pl.edu.agh.adhoc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 
 import pl.edu.agh.jsonrpc.RawDataSocket;
 
@@ -52,6 +53,12 @@ public class PrintAdHocSocket implements RawDataSocket {
 			e.printStackTrace();
 		}
 		opened = false;
+	}
+
+	@Override
+	public void rebind() throws SocketException {
+		
+		
 	}
 
 }

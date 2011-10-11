@@ -140,15 +140,40 @@ public class AdHocModule {
         String wepsetupMethod = this.settings.getString("encsetuppref", DEFAULT_ENCSETUP);
         String channel = this.settings.getString("channelpref", "1");
         
+        
+        String mac = this.wifiManager.getConnectionInfo().getMacAddress();       
+        String[] macChks = mac.split(":");
+        
+        byte[] ip = new byte[4];
+        int i =0;
+        for(String macChk: macChks) { 
+        	i++;
+        	if(i<=2) {
+        		continue;
+        	}
+        	Integer ipChk = Integer.parseInt(macChk, 16);
+        	ip[i-3] = ipChk.byteValue();
+        }
+        ip[0] = 10;
+        InetAddress address;
+		try {
+
+			address = InetAddress.getByAddress(ip);
+			lannetwork = address.getHostAddress();
+		
+		} catch (UnknownHostException e) {
+			Log.e(MSG_TAG, "Error while craeting ip");
+		}
+        
 		// tether.conf
-        String subnet = lannetwork.substring(0, lannetwork.lastIndexOf("."));
-        this.tethercfg.read();
+		this.tethercfg.read();
 		this.tethercfg.put("device.type", deviceType);
         this.tethercfg.put("tether.mode", bluetoothPref ? "bt" : "wifi");
         this.tethercfg.put("wifi.essid", ssid);
         this.tethercfg.put("wifi.channel", channel);
 		this.tethercfg.put("ip.network", lannetwork.split("/")[0]);
-		this.tethercfg.put("ip.gateway", subnet + ".254");        
+		this.tethercfg.put("ip.netmask", "255.0.0.0");
+		this.tethercfg.put("ip.gateway", lannetwork.split("/")[0]);        
 		this.tethercfg.put("wifi.interface", this.coretask.getProp("wifi.interface"));
 		this.tethercfg.put("wifi.txpower", txpower);
 
@@ -207,6 +232,7 @@ public class AdHocModule {
 		}
 		
 		Log.d(MSG_TAG, "Creation of configuration-files took ==> "+(System.currentTimeMillis()-startStamp)+" milliseconds.");
+		coretask.runRootCommand("cp " + AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.conf /data/data/android.tether/conf");
 	}
 	
 	// Start/Stop AdHoc
@@ -353,59 +379,63 @@ public class AdHocModule {
     }    
     
     public void installFiles() {
-    	new Thread(new Runnable(){
-			public void run(){
-				String message = null;
-				// libnativeTask.so	
-				if (message == null) {
-					File libNativeTaskFile = new File(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so");
-					if (libNativeTaskFile.exists()) {
-						message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so", R.raw.libnativetask_so);
-					}
-					else {
-						message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so", R.raw.libnativetask_so);
-					}
-				}
-				// tether
-		    	if (message == null) {
-			    	message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/tether", "0755", R.raw.tether);
-		    	}
-		    	// ifconfig
-		    	if (message == null) {
-			    	message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/ifconfig", "0755", R.raw.ifconfig);
-		    	}	
-		    	// iwconfig
-		    	if (message == null) {
-			    	message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/iwconfig", "0755", R.raw.iwconfig);
-		    	}
-				
-		    	// tiwlan.ini
-				if (message == null) {
-					AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tiwlan.ini", "0644", R.raw.tiwlan_ini);
-				}
-				// edify script
-				if (message == null) {
-					AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.edify", "0644", R.raw.tether_edify);
-				}
-				// tether.cfg
-				if (message == null) {
-					AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.conf", "0644", R.raw.tether_conf);
-				}
-				
-				// wpa_supplicant drops privileges, we need to make files readable.
-				AdHocModule.this.coretask.chmod(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/", "0755");
-
-				if (message == null) {
-			    	message = "Binaries and config-files installed!";
-				}
-				
-				// Sending message
-				Message msg = new Message();
-				msg.obj = message;
-				AdHocModule.this.displayMessageHandler.sendMessage(msg);
-			}
-		}).start();
-    }
+    	String message = null;
+    	// libnativeTask.so	
+    	if (message == null) {
+    		File libNativeTaskFile = new File(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so");
+    		if (libNativeTaskFile.exists()) {
+    			message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so", R.raw.libnativetask_so);
+    		}
+    		else {
+    			message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/library/libnativetask.so", R.raw.libnativetask_so);
+    		}
+    	}
+    	// tether
+    	if (message == null) {
+    		message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/tether", "0755", R.raw.tether);
+    	}
+    	// ifconfig
+    	if (message == null) {
+    		message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/ifconfig", "0755", R.raw.ifconfig);
+    	}	
+    	// iwconfig
+    	if (message == null) {
+    		message = AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/bin/iwconfig", "0755", R.raw.iwconfig);
+    	}
+    	
+    	// tiwlan.ini
+    	if (message == null) {
+    		File dir = new File("/data/data/android.tether/conf");
+    		if(! dir.exists()) {
+    			coretask.runRootCommand("/system/bin/mkdir -p /data/data/android.tether/conf");
+    		}
+    		AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tiwlan.ini", "0644", R.raw.tiwlan_ini);
+    		coretask.runRootCommand("cp " + AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tiwlan.ini /data/data/android.tether/conf");
+    	}
+    	// edify script
+    	if (message == null) {
+    		AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.edify", "0644", R.raw.tether_edify);
+    		coretask.runRootCommand("cp " + AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.edify /data/data/android.tether/conf");
+    	}
+    	// tether.cfg
+    	if (message == null) {
+    		AdHocModule.this.copyFile(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.conf", "0644", R.raw.tether_conf);
+    		coretask.runRootCommand("cp " + AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/tether.conf /data/data/android.tether/conf");
+    		
+    	}
+    	
+    	// wpa_supplicant drops privileges, we need to make files readable.
+    	AdHocModule.this.coretask.chmod(AdHocModule.this.coretask.DATA_FILE_PATH+"/conf/", "0755");
+    	
+    	if (message == null) {
+    		message = "Binaries and config-files installed!";
+    	}
+    	
+    	// Sending message
+    	Message msg = new Message();
+    	msg.obj = message;
+    	AdHocModule.this.displayMessageHandler.sendMessage(msg);
+    }	
    
     private String removeFile(String filename) {
     	
