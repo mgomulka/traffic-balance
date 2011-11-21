@@ -28,8 +28,8 @@ public class WayHibernateDao extends AbstractDao implements WayDao {
 
 	private static final double BOUNDING_BOX_SIZE = 0.1;
 	
-	private static final double MAX_RADIUS = 0.24;
-	private static final double PRIMARY_RADIUS = 0.17247492;
+	private static final double MAX_RADIUS = 0.17247492;
+	private static final double PRIMARY_RADIUS = 0.08623746;
 	private static final double SECONDARY_RADIUS = 0.04311873;
 	private static final double TETRIARY_RADIUS = 0.021559365;
 	

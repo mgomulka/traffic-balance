@@ -28,7 +28,7 @@ public class TrafficDataProvider extends AbstractProvider<TrafficDataListener> {
 	private static final int REFRESH_INTERVAL = 300;
 	private static final int REFRESH_AFTER_ERROR_INTERVAL = 15;
 
-	public static final int MIN_ZOOM = 11;
+	public static final int MIN_ZOOM = 12;
 	public static final int MAX_ZOOM = 15;
 
 	public enum Status {
